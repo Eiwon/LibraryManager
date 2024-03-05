@@ -32,7 +32,7 @@
 
 테이블 명 : BOOK
 컬럼 : 
-BOOK_ID       VARCHAR2   도서 ID(카테고리 ID에 따라 설정) - PK
+BOOK_ID      NUMBER   도서 ID - PK
 NAME      VARCHAR2   도서 명
 WRITER      VARCHAR2   저자
 CATEGORY   VARCHAR2   카테고리 - FK

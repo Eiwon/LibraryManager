@@ -1,0 +1,130 @@
+제작기간 : 0305 ~ 0315
+발표 0318
+
+1. 주제 : 도서 관리 프로그램
+
+2. 기능 
+- 관리자 모드, 일반 유저 모드 선택 가능
+
+관리자 모드
+- 도서 등록 : 도서ID(PK), 도서명, 저자, 출판사, 출판일, 카테고리, 보관 위치, (표지 이미지)
+- 도서 검색 : 도서명, 저자, 카테고리 중 하나를 선택하여 관련 도서 검색(대출 가능 여부도 필요)
+- 도서 정보 수정 : 도서 검색 후, 도서를 선택하여 정보 수정 가능
+- 도서 삭제 : 도서 검색 후, 도서를 선택하여 삭제 가능
+- 도서 대출 : 입력된 사용자의 대출 기록 추가, 도서 상태를 '대출 중'으로 변경
+- 도서 반납 : 입력된 사용자의 대출 기록 삭제, 도서 상태를 '대출 가능'으로 변경, 연체했다면 일정 기간 대출 불가
+- 대출 예약 : 입력된 사용자에게 대출 예약 설정 가능, 예약된 도서가 '대출 가능' 상태가 되면 '예약 중'으로 변경
+- 유저 등록 : 새로운 관리자 또는 유저를 등록 가능
+- 리포트 : 도서 대출 현황, 연체 중인 도서 목록, 대출 횟수가 많은 도서 목록, 유저 수, 문의 내역 등 확인 가능
+
+일반 유저
+- 도서 검색, 대출 예약/연장, 내 정보(대출/예약 내역, 대출 가능 도서량 등) 확인, 회원 등록 / 로그인 / 로그아웃
+- 도서 검색 : 비회원도 가능, 관리자 모드와 동일(수정, 삭제는 불가)
+- 회원 등록 : ID, pw, 이름, 전화번호, email을 입력받아 회원 등록.
+- 로그인 / 로그아웃 : ID, pw를 입력받아 로그인
+- 내 정보 : 자신 계정의 대출 내역, 예약 내역, 대출 가능 도서량 확인 가능
+- 대출 예약 : 로그인 상태라면 도서 검색시 대출 예약 기능 이용 가능
+- 대출 연장 : '내 정보'에서 대출 기간 연장 가능, 다른 유저가 예약한 상태라면 연장 불가
+- 도서 반납 : '내 정보'에서 대출한 도서 반납 가능.
+- 문의 기능 : 새 도서 구매 요구, 대출 관련 문의, 시설 문의 등 타입을 설정하여 관리자에게 메시지 전달 가능.
+
+3. DB 테이블
+
+테이블 명 : BOOK
+컬럼 : 
+BOOK_ID       VARCHAR2   도서 ID(카테고리 ID에 따라 설정) - PK
+NAME      VARCHAR2   도서 명
+WRITER      VARCHAR2   저자
+CATEGORY   VARCHAR2   카테고리 - FK
+PUBLISHER   VARCHAR2   출판사
+PUB_DATE   DATE      출판일
+STATE      VARCHAR2   도서 상태(정상, 대출 중, 예약 중, 분실)
+
+IMAGE      ????      표지 이미지 - NULLABLE
+
+
+
+
+
+유저 정보 관리 테이블
+테이블 명 : USER
+컬럼 : 
+USER_ID      VARCAHR2   유저 ID - PK
+PW      VARCHAR2   비밀번호
+NAME      VARCHAR2    이름
+PHONE      VARCHAR2    전화번호
+EMAIL       VARCHAR2   이메일
+AUTH      VARCHAR2   권한 (admin / user)   
+
+
+
+테이블 명 : BALCK_LIST
+컬럼 : 
+USER_ID       VARCHAR2   유저 ID - PK
+BAN_DATE   DATE      대출 금지당한 날짜
+RELEASE_DATE   DATE      대출 금지 해제 날짜      
+
+
+대출 / 예약 도서
+테이블 명 : CHECK_OUT
+컬럼 : 
+BOOK_ID      VARCHAR2   도서 ID   - PK
+USER_ID      VARCHAR2   유저 ID   - FK
+STATE      VARCHAR2   대출 / 예약 
+CHECK_OUT_DATE   DATE      대출 일자
+CHECK_IN_DATE   DATE      반납 예정 일자
+
+
+
+테이블 명 : REQUIREMENT
+컬럼 :
+MSG_ID      NUMBER      요구사항 ID - PK
+TITLE      VARCHAR2   요구사항 제목
+CONTENT   VARCHAR2   요구사항 내용
+TYPE      VARCHAR2   문의 종류 - FK
+DATE      DATE      문의 날짜
+USER_ID      VARCHAR2   문의자 ID - FK
+ISREAD      NUMBER      메시지를 읽었는지 여부
+
+
+
+4. 데이터 구조(VO)
+BookVO
+bookId (String) : 도서 ID
+name (String) : 도서 명
+writer (String) : 저자
+category (String) : 카테고리
+publisher (String) : 출판사
+pubDate (String) : 출판일
+state (String) : 도서 상태
+
+UserVO
+userId    (String)    유저 ID
+pw    (String)   비밀번호
+name   (String)   이름
+phone   (String)   전화번호
+email   (String)   이메일
+
+
+5. 클래스 명세서(생략 가능)
+Main.java : LibraryView 호출
+LibraryView.java : UI 클래스, GUI로 화면 구현
+
+BookVO.java : 도서의 Model 클래스
+UserVO.java : 유저의 Model 클래스
+
+LibraryDAO.java 
+= DAO 인터페이스. 일반 유저의 기능 메서드 정의
+
+LibraryAdminDAO.java 
+= DAO 인터페이스. 관리자의 추가 기능 메서드 정의
+
+LibraryDAOImple.java 
+= LibraryDAO implements 클래스. DB에 접근하여 일반 유저의 도서 검색, 대출, 내 정보 확인 기능 수행.
+
+LibraryAdminDAOImple.java 
+= LibraryDAOImple의 기능을 상속받고, LibraryAdminDAO을 구현한 클래스. 도서 등록, 수정, 삭제, 유저 등록, 리포트 확인 기능 수행.
+
+OracleQuery.java
+= Oracle DB 정보 인터페이스, DB 연결을 위한 상수. 사용자 정보, 테이블 및 컬럼 정보. 쿼리 작성
+

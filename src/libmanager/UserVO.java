@@ -6,6 +6,7 @@ public class UserVO {
 	String name;
 	String phone;
 	String email;
+	String auth;
 	
 	public UserVO() {}
 	public UserVO(String userId, String pw, String name, String phone, String email) {
@@ -15,6 +16,7 @@ public class UserVO {
 		this.name = name;
 		this.phone = phone;
 		this.email = email;
+		this.auth = "USER";
 	}
 	
 	public String getUserId() {
@@ -48,10 +50,17 @@ public class UserVO {
 		this.email = email;
 	}
 	
+	public String getAuth() {
+		return auth;
+	}
+	public void setAuth(String auth) {
+		this.auth = auth;
+	}
 	@Override
 	public String toString() {
 		return "UserVO [userId=" + userId + ", pw=" + pw + ", name=" + name + ", phone=" + phone + ", email=" + email
-				+ "]";
+				+ ", auth=" + auth + "]";
 	}
+	
 	
 }

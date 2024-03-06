@@ -9,10 +9,9 @@ import javax.swing.JPanel;
 public class SearchFrame extends JFrame{
 
 	private JPanel contentPane;
+
 	
 	public SearchFrame() {
-		
-		
 		initialize();
 	}
 	

@@ -47,14 +47,14 @@ IMAGE      ????      표지 이미지 - NULLABLE
 
 
 유저 정보 관리 테이블
-테이블 명 : USER
+테이블 명 : USER_INFO
 컬럼 : 
 USER_ID      VARCAHR2   유저 ID - PK
 PW      VARCHAR2   비밀번호
 NAME      VARCHAR2    이름
 PHONE      VARCHAR2    전화번호
 EMAIL       VARCHAR2   이메일
-AUTH      VARCHAR2   권한 (admin / user)   
+AUTH      VARCHAR2   권한 (ADMIN / USER)  - default = USER 
 
 
 
@@ -68,7 +68,7 @@ RELEASE_DATE   DATE      대출 금지 해제 날짜
 대출 / 예약 도서
 테이블 명 : CHECK_OUT
 컬럼 : 
-BOOK_ID      VARCHAR2   도서 ID   - PK
+BOOK_ID      NUMBER   도서 ID   - PK
 USER_ID      VARCHAR2   유저 ID   - FK
 STATE      VARCHAR2   대출 / 예약 
 CHECK_OUT_DATE   DATE      대출 일자
@@ -128,3 +128,27 @@ LibraryAdminDAOImple.java
 OracleQuery.java
 = Oracle DB 정보 인터페이스, DB 연결을 위한 상수. 사용자 정보, 테이블 및 컬럼 정보. 쿼리 작성
 
+
+
+할 일 : 회원가입, 로그인, 로그아웃
+로그인
+1. 유저가 우측 하단의 로그인 버튼을 클릭하여 로그인 창으로 이동
+2. ID, PW를 입력받아 DB 조회
+3. 유효한 사용자일 경우, 계정 정보를 DB로부터 읽어오고 메인 화면으로 이동
+4. 유효하지 않은 사용자일 경우, 입력창 하단에 메시지 출력
+
+회원가입
+1. 로그인 창의 회원가입 버튼 클릭시 회원정보를 입력받는 창으로 변경
+2. 입력 형식이 맞으면 회원가입 성공
+3. 안맞으면 해당 입력란 옆에 에러 메시지 출력
+
+화면 상단에 검색창 배치
+검색시, 그 하단에 검색 결과 출력
+검색 결과 클릭시 새 프레임에 자세한 정보 출력, 관리자면 수정, 삭제 가능
+
+
+OracleBookQuery
+ 도서 등록 : 도서ID(PK), 도서명, 저자, 출판사, 출판일, 카테고리, 보관 위치, (표지 이미지)
+- 도서 검색 : 도서명, 저자, 카테고리 중 하나를 선택하여 관련 도서 검색(대출 가능 여부도 필요)
+- 도서 정보 수정 : 도서 검색 후, 도서를 선택하여 정보 수정 가능
+- 도서 삭제 : 도서 검색 후, 도서를 선택하여 삭제 가능

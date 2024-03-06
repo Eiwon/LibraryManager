@@ -1,17 +1,18 @@
 package libManager;
 
 public class BookVO {
-	private String bookId;
+	private int bookId;
 	private String name;
 	private String writer;
 	private String category;
 	private String publisher;
 	private String pubDate;
 	private String state;
+	private String img = null;
 	
 	public BookVO() {}
-	public BookVO(String bookId, String name, String writer, String category, String publisher, String pubDate,
-			String state) {
+	public BookVO(int bookId, String name, String writer, String category, String publisher, String pubDate,
+			String state, String img) {
 		super();
 		this.bookId = bookId;
 		this.name = name;
@@ -20,9 +21,10 @@ public class BookVO {
 		this.publisher = publisher;
 		this.pubDate = pubDate;
 		this.state = state;
+		this.img = img;
 	}
 	
-	public BookVO(String bookId, String name, String writer, String category, String publisher, String pubDate) {
+	public BookVO(int bookId, String name, String writer, String category, String publisher, String pubDate) {
 		super();
 		this.bookId = bookId;
 		this.name = name;
@@ -34,11 +36,11 @@ public class BookVO {
 	}
 
 	
-	public String getBookId() {
+	public int getBookId() {
 		return bookId;
 	}
 
-	public void setBookId(String bookId) {
+	public void setBookId(int bookId) {
 		this.bookId = bookId;
 	}
 
@@ -88,6 +90,12 @@ public class BookVO {
 
 	public void setState(String state) {
 		this.state = state;
+	}
+	public String getImg() {
+		return img;
+	}
+	public void setImg(String img) {
+		this.img = img;
 	}
 	
 	@Override

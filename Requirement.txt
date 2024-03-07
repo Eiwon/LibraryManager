@@ -35,15 +35,12 @@
 BOOK_ID      NUMBER   도서 ID - PK
 NAME      VARCHAR2   도서 명
 WRITER      VARCHAR2   저자
-CATEGORY   VARCHAR2   카테고리 - FK
+CATEGORY   VARCHAR2   카테고리
 PUBLISHER   VARCHAR2   출판사
 PUB_DATE   DATE      출판일
 STATE      VARCHAR2   도서 상태(정상, 대출 중, 예약 중, 분실)
 
 IMAGE      ????      표지 이미지 - NULLABLE
-
-
-
 
 
 유저 정보 관리 테이블
@@ -70,7 +67,7 @@ RELEASE_DATE   DATE      대출 금지 해제 날짜
 컬럼 : 
 BOOK_ID      NUMBER   도서 ID   - PK
 USER_ID      VARCHAR2   유저 ID   - FK
-STATE      VARCHAR2   대출 / 예약 
+STATE      VARCHAR2   대출 / 예약 - FK
 CHECK_OUT_DATE   DATE      대출 일자
 CHECK_IN_DATE   DATE      반납 예정 일자
 
@@ -148,7 +145,55 @@ OracleQuery.java
 
 
 OracleBookQuery
- 도서 등록 : 도서ID(PK), 도서명, 저자, 출판사, 출판일, 카테고리, 보관 위치, (표지 이미지)
-- 도서 검색 : 도서명, 저자, 카테고리 중 하나를 선택하여 관련 도서 검색(대출 가능 여부도 필요)
-- 도서 정보 수정 : 도서 검색 후, 도서를 선택하여 정보 수정 가능
-- 도서 삭제 : 도서 검색 후, 도서를 선택하여 삭제 가능
+
+ 도서 대출 : 입력된 사용자의 대출 기록 추가, 도서 상태를 '대출 중'으로 변경
+INSERT CHECK_OUT
+- 도서 반납 : 입력된 사용자의 대출 기록 삭제, 도서 상태를 '대출 가능'으로 변경, 연체했다면 일정 기간 대출 불가
+- 대출 예약 : 입력된 사용자에게 대출 예약 설정 가능, 예약된 도서가 '대출 가능' 상태가 되면 '예약 중'으로 변경
+리포트 : 도서 대출 현황, 연체 중인 도서 목록, 대출 횟수가 많은 도서 목록, 유저 수, 문의 내역 등 확인 가능
+일반 유저
+- 도서 검색, 대출 예약/연장, 내 정보(대출/예약 내역, 대출 가능 도서량 등) 확인
+대출 예약 : 로그인 상태라면 도서 검색시 대출 예약 기능 이용 가능
+- 대출 연장 : '내 정보'에서 대출 기간 연장 가능, 다른 유저가 예약한 상태라면 연장 불가
+- 도서 반납 : '내 정보'에서 대출한 도서 반납 가능.
+- 
+
+대출 반납 예약 구현
+대출 : 책을 선택 후 대출 클릭
+-> 대출용 dialog 출력 ( 도서 정보 출력)
+- 대여중이라면 반납예정일 출력해주고 대여 불가 = SELECT 반납예정일 FROM CHECK_OUT WHERE BOOK_ID = ?
+- set 상태일 때만 대여 가능
+- 예약중이라면 예약자의 반납예정일 출력해주고 대여 불가 = 위와 동일
+-> 대여하기 버튼 클릭하여 대여 = INSERT INTO CHECK_OUT 
+-> 취소 버튼 클릭시, 변화 없이 다이얼로그 종료
+ 
+CHECK_OUT 테이블에 INSERT, BOOK 테이블의 STATE 값 UPDATE
+
+반납 : '내 정보'에서 테이블에 표시된 책을 클릭 -> 반납 버튼 클릭
+예약 : 검색창에 검색 -> OUT 상태인 책 선택 후 대출 클릭? 하면 예약창 
+
+// 대출, 예약시 자동으로 BOOK 테이블의 값도 변경
+CREATE TRIGGER STATE_RESERVED_TRIGGER
+AFTER INSERT ON CHECK_OUT
+FOR EACH ROW
+BEGIN
+    UPDATE BOOK
+    SET BOOK.STATE = :NEW.STATE
+    WHERE BOOK.BOOK_ID = :NEW.BOOK_ID;
+END;
+COMMIT;
+
+// 반납시 자동으로 BOOK 테이블의 값도 변경
+CREATE TRIGGER STATE_RETURN_TRIGGER
+AFTER DELETE ON CHECK_OUT
+FOR EACH ROW
+BEGIN
+    UPDATE BOOK
+    SET BOOK.STATE = 'SET'
+    WHERE BOOK.BOOK_ID = :OLD.BOOK_ID;
+END;
+
+SELECT CHECK_IN_DATE FROM CHECK_OUT
+WHERE BOOK_ID = ?;
+? = BOOK_ID
+

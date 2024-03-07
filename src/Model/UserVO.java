@@ -1,12 +1,12 @@
-package libManager;
+package Model;
 
 public class UserVO {
-	String userId;
-	String pw;
-	String name;
-	String phone;
-	String email;
-	String auth;
+	private String userId;
+	private String pw;
+	private String name;
+	private String phone;
+	private String email;
+	private String auth;
 	
 	public UserVO() {}
 	public UserVO(String userId, String pw, String name, String phone, String email) {
@@ -16,7 +16,7 @@ public class UserVO {
 		this.name = name;
 		this.phone = phone;
 		this.email = email;
-		this.auth = "USER";
+		this.auth = "ADMIN";
 	}
 	
 	public String getUserId() {

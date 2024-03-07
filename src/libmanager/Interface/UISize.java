@@ -1,4 +1,4 @@
-package libManager;
+package libManager.Interface;
 
 public interface UISize {
 	public static final int btnWidth = 100;

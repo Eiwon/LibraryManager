@@ -1,6 +1,10 @@
-package libManager;
+package libManager.Interface;
+
+import Model.UserVO;
 
 public interface UserDAO {
+	
+	public static final UserVO defaultUser = new UserVO("Guest", "guest", "guest", "0", "guest"); 
 	
 	public int insertUser(UserVO vo);
 	

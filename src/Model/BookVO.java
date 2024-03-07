@@ -1,4 +1,4 @@
-package libManager;
+package Model;
 
 public class BookVO {
 	private int bookId;
@@ -32,7 +32,8 @@ public class BookVO {
 		this.category = category;
 		this.publisher = publisher;
 		this.pubDate = pubDate;
-		this.state = "정상";
+		this.state = "SET";
+		this.img = null;
 	}
 
 	

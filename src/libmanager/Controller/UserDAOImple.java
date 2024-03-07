@@ -1,4 +1,4 @@
-package libManager;
+package libManager.Controller;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -6,13 +6,16 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import Model.UserVO;
+import libManager.Interface.OracleUserQuery;
+import libManager.Interface.UserDAO;
 import oracle.jdbc.OracleDriver;
 
 public class UserDAOImple implements UserDAO, OracleUserQuery{
 	
 	Connection conn = null;
 	PreparedStatement pstmt = null;
-	private static UserVO currentUser = null;
+	private static UserVO currentUser = defaultUser;
 	private static UserDAOImple instance = null;
 	
 	//싱글톤
@@ -43,11 +46,11 @@ public class UserDAOImple implements UserDAO, OracleUserQuery{
 			conn = DriverManager.getConnection(URL, USER, PASSWORD);
 			pstmt = conn.prepareStatement(SQL_INSERT);
 			
-			pstmt.setString(1, vo.userId);
-			pstmt.setString(2, vo.pw);
-			pstmt.setString(3, vo.name);
-			pstmt.setString(4, vo.phone);
-			pstmt.setString(5, vo.email);
+			pstmt.setString(1, vo.getUserId());
+			pstmt.setString(2, vo.getPw());
+			pstmt.setString(3, vo.getName());
+			pstmt.setString(4, vo.getPhone());
+			pstmt.setString(5, vo.getEmail());
 			
 			res = pstmt.executeUpdate();
 			if(res == 1) {

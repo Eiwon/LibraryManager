@@ -1,4 +1,4 @@
-package libManager;
+package libManager.Interface;
 
 public interface OracleUserQuery {
 	public static final String URL = "jdbc:oracle:thin:@localhost:1521:xe"; // 접속할 오라클 경로
@@ -12,6 +12,10 @@ public interface OracleUserQuery {
 	public static final String PHONE = "PHONE";
 	public static final String EMAIL = "EMAIL";
 	public static final String AUTH = "AUTH";
+	
+	public static final String AUTH_USER = "USER";
+	public static final String AUTH_ADMIN = "ADMIN";
+	
 	
 	public static final String SQL_INSERT = 
 			"INSERT INTO " + TABLE_NAME + " VALUES(?, ?, ?, ?, ?, 'USER')";

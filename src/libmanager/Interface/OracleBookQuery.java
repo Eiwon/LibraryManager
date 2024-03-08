@@ -18,10 +18,12 @@ public interface OracleBookQuery {
 	
 	public static final String TABLE_CHECK_OUT = "CHECK_OUT";
 	public static final String CHECK_IN_DATE = "CHECK_IN_DATE";	
+	public static final String CHECK_OUT_DATE = "CHECK_OUT_DATE";
 	
 	public static final String BOOK_STATE_OUT = "OUT";
 	public static final String BOOK_STATE_SET = "SET";
 	public static final String BOOK_STATE_RSV = "RESERVED";
+	public static final String BOOK_STATE_RSVSET = "SET(RESERVED)";
 	public static final String BOOK_STATE_LOST = "LOST";
 	
 	public static final String CATEGORY_FICTION = "FICTION";
@@ -70,6 +72,30 @@ public interface OracleBookQuery {
 	
 	// check_out 테이블에 데이터 추가 쿼리(book_id, user_id, state, check_out_date, check_in_date)
 	public static final String SQL_INSERT_CHECK_OUT = 
-			"INSERT INTO " + TABLE_CHECK_OUT + " VALUES( ?, ?, ?, SYSDATE, TO_DATE(?, 'YYYY-MM-DD HH24-MI-SS'))";
+			"INSERT INTO " + TABLE_CHECK_OUT + " VALUES( ?, ?, ?, TO_DATE(?, 'YYYY-MM-DD HH24-MI-SS'), TO_DATE(?, 'YYYY-MM-DD HH24-MI-SS'))";
+	
+	// check_out 테이블로부터, 특정 book을 대출 또는 예약한 유저의 user_id 확인
+	public static final String SQL_SELECT_USER_BY_BOOK_STATE = 
+			"SELECT " + OracleUserQuery.USER_ID + " FROM " + TABLE_CHECK_OUT + " WHERE " + BOOK_ID + " = ? AND " + STATE + " = ?" ;
+	
+	// check_out 테이블로부터, 지정한 userId의 행 검색
+	//SELECT C.BOOK_ID, B.STATE, C.CHECK_OUT_DATE, C.CHECK_IN_DATE, B.NAME, B.WRITER, B.CATEGORY, C.STATE, B.IMAGE 
+	public static final String SQL_SELECT_ALL_INFO_BY_USER =
+				"SELECT " + TABLE_CHECK_OUT + "." + STATE + ", " + TABLE_CHECK_OUT + "." + BOOK_ID +
+				", " + TABLE_BOOK + "." + NAME + ", " + TABLE_BOOK + "." + WRITER + ", " + TABLE_BOOK + "."
+				+ CATEGORY + ", " + TABLE_BOOK + "." + STATE + ", " + TABLE_CHECK_OUT + "." + CHECK_OUT_DATE 
+				+ ", " + TABLE_CHECK_OUT + "." + CHECK_IN_DATE + ", "+ TABLE_BOOK + "." + IMAGE + " FROM " + TABLE_CHECK_OUT + " JOIN " + TABLE_BOOK + " ON " + 
+				TABLE_CHECK_OUT + "." + BOOK_ID + " = " + TABLE_BOOK + "." + BOOK_ID + " WHERE " + OracleUserQuery.USER_ID + " = ?";
+		
+		//"대출/예약", "도서 코드", "제목", "저자", "카테고리", "상태", "대출/예약일", "반납/예약만료일"
+		
+	public static final String SQL_DELETE_BY_BOOK_ID = 
+			"DELETE " + TABLE_CHECK_OUT + " WHERE " + BOOK_ID + " = ? AND " + STATE + " = ?";
+	public static final String SQL_UPDATE_STATE_BY_BOOK_ID = 
+			"UPDATE " + TABLE_BOOK + " SET " + STATE + " = ? WHERE " + BOOK_ID + " = ?";  
+	
+	// book_id로 선택하여 반납기한 재지정 
+	public static final String SQL_UPDATE_CHECK_IN_DATE =
+			"UPDATE " + TABLE_CHECK_OUT + " SET " + CHECK_IN_DATE + " = ? WHERE " + BOOK_ID + " = ?";
 	
 }

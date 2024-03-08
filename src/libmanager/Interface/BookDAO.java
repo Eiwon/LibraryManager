@@ -16,5 +16,15 @@ public interface BookDAO {
 	
 	public String selectCheckinDate(int bookId);
 	
-	public int checkoutBook(int bookId, String userId, String state, String checkinDate);
+	public int insertCheckoutBook(int bookId, String userId, String state, String checkoutDate,String checkinDate);
+	
+	public String selectByBookState(int bookId, String state);
+	
+	public ArrayList<ArrayList<String>> selectAllInfoById(String userId);
+	
+	public int deleteByBookId(int bookId, String state);
+	
+	public int updateByBookId(String state, int bookId);
+	
+	public int updateCheckinDate(int bookId, String checkinDate);
 }

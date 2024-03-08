@@ -37,7 +37,6 @@ public class Library implements UISize{
 	private BookUpdateDialog budInsert;
 	private JPanel panelForMember;
 	private JButton btnBorrow;
-	private JButton btnReserve;
 	private JButton btnMyInfo;
 	public Library() {
 		initialize();
@@ -100,7 +99,6 @@ public class Library implements UISize{
 		
 		btnLogout = new JButton();
 		btnLogout.setBounds(1150, 750, 100, 50);
-		
 		btnLogout.setText("로그아웃");
 		btnLogout.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -116,6 +114,7 @@ public class Library implements UISize{
 		panelForAdmin.setLayout(null);
 		
 		btnInsert = new JButton();
+		btnInsert.setText("등록");
 		btnInsert.setBounds(15, 10, 119, 46);
 		panelForAdmin.add(btnInsert);
 		btnInsert.addActionListener(new ActionListener() {
@@ -123,9 +122,10 @@ public class Library implements UISize{
 				budInsert = new BookUpdateDialog();
 			}
 		});
-		btnInsert.setText("등록");
+		
 		
 		btnUpdate = new JButton();
+		btnUpdate.setText("수정");
 		btnUpdate.setBounds(15, 66, 119, 46);
 		panelForAdmin.add(btnUpdate);
 		btnUpdate.addActionListener(new ActionListener() {
@@ -135,9 +135,10 @@ public class Library implements UISize{
 					budInsert = new BookUpdateDialog(vo);
 			}
 		});
-		btnUpdate.setText("수정");
+		
 		
 		btnDelete = new JButton();
+		btnDelete.setText("삭제");
 		btnDelete.setBounds(15, 122, 119, 46);
 		panelForAdmin.add(btnDelete);
 		btnDelete.addActionListener(new ActionListener() {
@@ -145,7 +146,7 @@ public class Library implements UISize{
 				BookDAOImple.getInstance().deleteBook(bookManager.getSelectedBook().getBookId());
 			}
 		});
-		btnDelete.setText("삭제");
+		
 		
 		panelForMember = new JPanel();
 		panelForMember.setBounds(1101, 177, 149, 186);
@@ -153,6 +154,8 @@ public class Library implements UISize{
 		panelForMember.setLayout(null);
 		
 		btnBorrow = new JButton();
+		btnBorrow.setText("도서 대출");
+		btnBorrow.setBounds(12, 10, 119, 46);
 		btnBorrow.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				BookVO vo = bookManager.getSelectedBook();
@@ -161,18 +164,18 @@ public class Library implements UISize{
 				}
 			}
 		});
-		btnBorrow.setText("도서 대출");
-		btnBorrow.setBounds(12, 10, 119, 46);
-		panelForMember.add(btnBorrow);
 		
-		btnReserve = new JButton();
-		btnReserve.setText("예약");
-		btnReserve.setBounds(12, 67, 119, 46);
-		panelForMember.add(btnReserve);
+		panelForMember.add(btnBorrow);
 		
 		btnMyInfo = new JButton();
 		btnMyInfo.setText("내 정보");
 		btnMyInfo.setBounds(12, 123, 119, 46);
+		btnMyInfo.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				new MyInfoDialog();
+			}
+		});
+		
 		panelForMember.add(btnMyInfo);
 		
 		btnRefresh();

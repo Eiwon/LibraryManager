@@ -5,6 +5,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 import Model.UserVO;
 import libManager.Interface.OracleUserQuery;
@@ -140,5 +141,37 @@ public class UserDAOImple implements UserDAO, OracleUserQuery{
 		
 		return vo;
 	}
+
+	@Override
+	public int insertBlackList(String userId, String banDate, String releaseDate) {
+		System.out.println("userdaoimple : insertBlackList");
+		int res = 0;
+		try {
+			DriverManager.registerDriver(new OracleDriver());
+			conn = DriverManager.getConnection(URL, USER, PASSWORD);
+			pstmt = conn.prepareStatement(SQL_INSERT_BLACK);
+			
+			pstmt.setString(1, userId);
+			pstmt.setString(2, banDate);
+			pstmt.setString(3, releaseDate);
+			
+			res = pstmt.executeUpdate();
+			if(res == 1) {
+				System.out.println("유저 등록 성공");
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				conn.close();
+				pstmt.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		return res;
+	} // end insertBlackList
+
 
 }

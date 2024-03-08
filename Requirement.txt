@@ -78,12 +78,27 @@ CHECK_IN_DATE   DATE      반납 예정 일자
 MSG_ID      NUMBER      요구사항 ID - PK
 TITLE      VARCHAR2   요구사항 제목
 CONTENT   VARCHAR2   요구사항 내용
-TYPE      VARCHAR2   문의 종류 - FK
+TYPE      VARCHAR2   문의 종류
 DATE      DATE      문의 날짜
 USER_ID      VARCHAR2   문의자 ID - FK
 ISREAD      NUMBER      메시지를 읽었는지 여부
 
+==> 게시판 형식으로 변경
+postId
+postTitle
+postContent
+userId
+tag
+view
+replyList<replyId>
+writeDate
 
+reply
+replyId
+postId
+userId
+content
+writeDate
 
 4. 데이터 구조(VO)
 BookVO
@@ -172,28 +187,201 @@ CHECK_OUT 테이블에 INSERT, BOOK 테이블의 STATE 값 UPDATE
 반납 : '내 정보'에서 테이블에 표시된 책을 클릭 -> 반납 버튼 클릭
 예약 : 검색창에 검색 -> OUT 상태인 책 선택 후 대출 클릭? 하면 예약창 
 
-// 대출, 예약시 자동으로 BOOK 테이블의 값도 변경
-CREATE TRIGGER STATE_RESERVED_TRIGGER
-AFTER INSERT ON CHECK_OUT
-FOR EACH ROW
-BEGIN
-    UPDATE BOOK
-    SET BOOK.STATE = :NEW.STATE
-    WHERE BOOK.BOOK_ID = :NEW.BOOK_ID;
-END;
-COMMIT;
-
-// 반납시 자동으로 BOOK 테이블의 값도 변경
-CREATE TRIGGER STATE_RETURN_TRIGGER
-AFTER DELETE ON CHECK_OUT
-FOR EACH ROW
-BEGIN
-    UPDATE BOOK
-    SET BOOK.STATE = 'SET'
-    WHERE BOOK.BOOK_ID = :OLD.BOOK_ID;
-END;
 
 SELECT CHECK_IN_DATE FROM CHECK_OUT
 WHERE BOOK_ID = ?;
 ? = BOOK_ID
+
+
+해야할 것
+
+대출 테이블 트리거들
+CHECK_OUT에 INSERT시 BOOK 의 STATE도 같은 값으로 변경 
+
+CHECK_OUT에서 DELETE시 BOOK의 STATE를 SET으로 변경 X
+ -> 대출 DELETE면 SET으로 변경
+-> 예약한 책을 반납시 -> 
+->  예약 DELETE면 -> 대여로 인한 DELETE면 OUT으로 변경(어차피 예약 DELETE 후 대여 INSERT 추가하니까 상관없을듯)
+	ㄴ 예약 기간 만료로 인한 DELETE면 SET으로 변경
+= 예약 DELETE시 => 대여로 인한 DELETE는 신경 X, 어떤 DELETE라도 발동시 SET으로 변경
+
+
+예약 기능 구현
+ㄴ 대출 중인 도서를 예약 가능 : 대출 창에서 구현해야 할듯 == 대출 상태면 예약 버튼 활성화
+ㄴ 예약된 도서는 반납되더라도 다른 사람이 대출 불가
+ㄴ 자신이 예약한 도서라면 -> 대출 버튼 활성화 (SELECT USER_ID FROM CHECK_OUT WHERE BOOK_ID = ? AND STATE = 'RESERVED'
+ -> 클릭시 대출 기능 진행 
+	ㄴ CHECK_OUT 테이블의 PRIMARY KEY를 복합키(BOOK_ID, STATE)로 변경, 대출 상태와 예약 상태를 따로 관리 
+	업데이트시 트리거 발동 -> BOOK 테이블 수정 
+ㄴ 아니라면 -> 비활성화
+
+책의 상태
+- 기본 SET
+- 대출중 OUT
+- 대출 + 예약중 RESERVED
+- 대출가능 + 예약중 SET(RESERVED)
+- 이용불가 LOST
+
+
+대출
+- SET 상태면 OUT으로 변경
+ BOOK.STATE = SET이면 INSERT, 
+==> INSERT 트리거 -> BOOK.STATE = OUT
+- SET(RESERVED) 상태면 OUT으로 변경
+ BOOK.STATE = SET(RESERVED) 상태면 OUT으로 변경, CHECK_OUT 
+==> DELETE 후 INSERT => DELETE 트리거 -> BOOK.STATE = SET, INSERT 트리거 -> BOOK.STATE = OUT
+
+예약
+- OUT 상태면 RESERVED로 변경
+ BOOK.STATE = OUT 이면 INSERT
+==> INSERT 트리거 -> BOOK.STATE = RESERVED
+
+반납
+- OUT 상태면 SET으로 변경
+ BOOK.STATE = OUT 이면 DELETE
+== DELETE 트리거 -> BOOK.STATE = SET
+- RESERVED 상태면 SET(RESERVED)로 변경
+ BOOK.STATE = RESERVED 이면 
+== 
+ 
+
+
+CHECKOUT에는 ACTION만 저장
+책의 진짜 상태는 BOOK에
+대출 : BOOK.STATE가 SET인 상태 : CHECK_OUT에 OUT 열 추가
+-> BOOK.STATE = OUT
+BOOK.STATE가 SET(RESERVED)인 상태 : CHECK_OUT UPDATE 
+-> BOOK.STATE = OUT
+
+예약 : BOOK.STATE = OUT 상태 : CHECK_OUT에 RESERVED 열 추가
+-> BOOK.STATE = RESERVED
+
+반납 : BOOK.STATE = OUT 상태 : CHECK_OUT DELETE, BOOK.STATE = SET
+BOOK.STATE = RESERVED 상태 : 
+CHECK_OUT UPDATE
+BOOK.STATE = SET(RESERVED)
+
+RESERVED일때 DELETE => 
+
+
+내 정보 기능 구현
+
+- checkout 의 user_id가 자신인 모든 열과 그 book_id에 해당하는 book 테이블의 정보
+SELECT * FROM CHECK_OUT JOIN BOOK
+ON CHECK_OUT.BOOK_ID = BOOK.BOOK_ID
+
+ㄴ 도서 반납
+ㄴ 대출 기간 연장
+자신 계정의 대출 내역, 예약 내역, 대출 가능 도서량 확인 가능
++ 블랙리스트
+
+
+트리거 사용 X
+
+대출
+BOOK.STATE가 SET이면 
+- CHECK_OUT에 OUT 열 추가, BOOK.STATE = OUT 
+1) INSERT INTO CHECK_OUT VALUES(); 
+2) UPDATE BOOK SET BOOK.STATE = 'OUT'
+WHERE BOOK_ID = ?;
+
+BOOK.STATE가 SET(RESERVED)이면
+- CHECK_OUT에 OUT 열 추가, BOOK.STATE = OUT
+
+로그인시 할것
+블랙리스트 확인
+CHECKOUT 불러오기
+
+
+테이블 분리
+SET : 대출 가능 
+BOOK 테이블의 STATE를 OUT으로 UPDATE
+CHECKOUT 테이블에 INSERT
+
+RESERVED : 예약자만 대출 가능
+예약한 책인지 확인 
+
+예약
+BOOK.STATE가 OUT이면
+- CHECK_OUT에 RESERVED 열 추가, BOOK.STATE = RESERVED
+
+반납
+BOOK.STATE가 OUT이면
+- CHECK_OUT의 열 삭제, BOOK.STATE = SET
+3) DELETE CHECK_OUT WHERE BOOK_ID = ? AND STATE = ?
+
+BOOK.STATE가 RESERVED이면
+- CHECK_OUT의 열 삭제, BOOK.STATE = SET(RESERVED)
+
+
+내 정보
+CHECK_OUT의 USER_ID가 일치하는 모든 열과, 그 BOOK_ID에 해당하는 BOOK 의 모든 열 출력
+
+SELECT * FROM CHECK_OUT JOIN BOOK ON CHECK_OUT.BOOK_ID = BOOK.BOOK_ID;
+
+연장
+BOOK.STATE가 OUT일 때, CHECK_IN_DATE - CHECK_OUT_DATE가 14 이하일 때,
+  CHECK_IN_DATE를 현재 시간 +7일로 변경
+UPDATE CHECK_OUT SET CHECK_IN_DATE = ? WHERE BOOK_ID = ?;
+
+
+
+자신이 대출한 책은 예약 못하게 변경
+
+대출 버튼 : 대여 가능 상태일 때만 활성화
+예약 버튼 : 대출 중이고 자신이 대출한 상태가 아닐 때에만 활성화
+
+
+로그인시, select min(checkindate) from checkout where userid = userid and state = 'out' 이 sysdate보다 작으면,
+insert into blacklist values ( userid, sysdate, sysdate +30);  isBan = true;
+
+로그인시, select releasedate from blacklist where userid = userid 의 결과가 있으면, 해당 결과와 sysdate를 비교,
+기간이 지났으면 delete blacklist where userid = userid
+아니면 글로벌 변수 isBan = true로 지정
+
+isBan = true면 대여 버튼, 예약 버튼 비활성화
+
+
+문의하기 버튼 클릭시 게시판으로 이동
+게시글 전체 요청
+SELECT POST_ID, POST_TITLE, USER_ID, TAG, VIEW, WRITE_DATE FROM POST
+
+게시글 1개 요청
+SELECT * FROM POST WHERE POST_ID = postId
+댓글 요청
+SELECT * FROM REPLY WHERE POST_ID = postId
+
+글 작성
+INSERT INTO POST VALUES (...,0 , NULL, );
+댓글 작성
+INSERT INTO REPLY VALUES ()
+
+
+
+
+==> 게시판 형식으로 변경
+postId
+postTitle
+postContent
+userId
+tag
+view
+writeDate
+replyList<replyId>
+
+
+reply
+replyId
+postId
+userId
+content
+writeDate
+
+
+
+
+
+
+- 리포트 : 도서 대출 현황, 연체 중인 도서 목록, 대출 횟수가 많은 도서 목록, 유저 수, 문의 내역 등 확인 가능
+
 

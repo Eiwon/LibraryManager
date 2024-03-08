@@ -1,5 +1,7 @@
 package libManager.Interface;
 
+import java.util.ArrayList;
+
 import Model.UserVO;
 
 public interface UserDAO {
@@ -11,4 +13,6 @@ public interface UserDAO {
 	public UserVO selectByID(String userId);
 	
 	public UserVO selectWithPw(String userId, String pw);
+	
+	public int insertBlackList(String userId, String banDate, String releaseDate);
 }

@@ -235,7 +235,7 @@ public class BookDAOImple implements BookDAO, OracleBookQuery{
 	}
 
 	@Override
-	public int checkoutBook(int bookId, String userId, String state, String checkinDate) {
+	public int insertCheckoutBook(int bookId, String userId, String state, String checkoutDate, String checkinDate) {
 		System.out.println("bookDaoImple : checkoutBook()");
 		int res = 0;
 		try {
@@ -246,7 +246,8 @@ public class BookDAOImple implements BookDAO, OracleBookQuery{
 			pstmt.setInt(1, bookId);
 			pstmt.setString(2, userId);
 			pstmt.setString(3, state);
-			pstmt.setString(4, checkinDate);
+			pstmt.setString(4, checkoutDate);
+			pstmt.setString(5, checkinDate);
 			
 			res = pstmt.executeUpdate();
 			
@@ -267,5 +268,162 @@ public class BookDAOImple implements BookDAO, OracleBookQuery{
 		return res;
 	}
 	
+	public String selectByBookState(int bookId, String state) {
+		System.out.println("bookDaoImple : selectByBookState()");
+		String userId = "";
+		try {
+			DriverManager.registerDriver(new OracleDriver());
+			conn = DriverManager.getConnection(URL, USER, PASSWORD);
+			
+			pstmt = conn.prepareStatement(OracleBookQuery.SQL_SELECT_USER_BY_BOOK_STATE);
+			pstmt.setInt(1, bookId);
+			pstmt.setString(2, state);
+			
+			ResultSet rs = pstmt.executeQuery();
+			
+			if(rs.next()) {
+				userId = rs.getString(1);
+			}
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}finally {
+			try {
+				conn.close();
+				pstmt.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		return userId;
+	}
 
+	@Override
+	public ArrayList<ArrayList<String>> selectAllInfoById(String userId) {
+		System.out.println("bookDaoImple : selectAllInfoById()");
+		ArrayList<ArrayList<String>> list = new ArrayList<>();
+		try {
+			DriverManager.registerDriver(new OracleDriver());
+			conn = DriverManager.getConnection(URL, USER, PASSWORD);
+			
+			pstmt = conn.prepareStatement(OracleBookQuery.SQL_SELECT_ALL_INFO_BY_USER);
+			pstmt.setString(1, userId);
+			
+			ResultSet rs = pstmt.executeQuery();
+			//C.BOOK_ID, B.STATE, C.CHECK_OUT_DATE, C.CHECK_IN_DATE, B.NAME, B.WRITER, B.CATEGORY, C.STATE, B.IMAGE 
+			
+			while(rs.next()) {
+				ArrayList<String> l = new ArrayList<>(); 
+				l.add(rs.getString(1));
+				l.add(String.valueOf(rs.getInt(2)));
+				for(int i = 3; i < 9; i++) {
+					l.add(rs.getString(i));
+				}
+				list.add(l);
+			}
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}finally {
+			try {
+				conn.close();
+				pstmt.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		return list;
+	}
+
+	@Override
+	public int deleteByBookId(int bookId, String state) {
+		System.out.println("bookDaoImple : deleteByBookId()");
+		int res = 0;
+		try {
+			DriverManager.registerDriver(new OracleDriver());
+			conn = DriverManager.getConnection(URL, USER, PASSWORD);
+			pstmt = conn.prepareStatement(SQL_DELETE_BY_BOOK_ID);
+			
+			pstmt.setInt(1, bookId);
+			pstmt.setString(2, state);
+			res = pstmt.executeUpdate();
+			
+			if(res == 1)
+				System.out.println("삭제 성공");
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}finally {
+			try {
+				conn.close();
+				pstmt.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		return res;
+	}
+
+	@Override
+	public int updateByBookId(String state, int bookId) {
+		System.out.println("bookDaoImple : updateByBookId()");
+		int res = 0;
+		try {
+			DriverManager.registerDriver(new OracleDriver());
+			conn = DriverManager.getConnection(URL, USER, PASSWORD);
+			pstmt = conn.prepareStatement(SQL_UPDATE_STATE_BY_BOOK_ID);
+			
+			pstmt.setString(1, state);
+			pstmt.setInt(2, bookId);
+			res = pstmt.executeUpdate();
+			
+			if(res == 1)
+				System.out.println("수정 성공");
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}finally {
+			try {
+				conn.close();
+				pstmt.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		return res;
+	}
+
+	@Override
+	public int updateCheckinDate(int bookId, String checkinDate) {
+		System.out.println("bookDaoImple : updateCheckinDate()");
+		int res = 0;
+		try {
+			DriverManager.registerDriver(new OracleDriver());
+			conn = DriverManager.getConnection(URL, USER, PASSWORD);
+			pstmt = conn.prepareStatement(SQL_UPDATE_CHECK_IN_DATE);
+			System.out.println(checkinDate);
+			pstmt.setString(1, checkinDate);
+			pstmt.setInt(2, bookId);
+			res = pstmt.executeUpdate();
+			
+			if(res == 1)
+				System.out.println("수정 성공");
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}finally {
+			try {
+				conn.close();
+				pstmt.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		return res;
+	}
 }

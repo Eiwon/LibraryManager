@@ -1,0 +1,387 @@
+제작기간 : 0305 ~ 0315
+발표 0318
+
+1. 주제 : 도서 관리 프로그램
+
+2. 기능 
+- 관리자 모드, 일반 유저 모드 선택 가능
+
+관리자 모드
+- 도서 등록 : 도서ID(PK), 도서명, 저자, 출판사, 출판일, 카테고리, 보관 위치, (표지 이미지)
+- 도서 검색 : 도서명, 저자, 카테고리 중 하나를 선택하여 관련 도서 검색(대출 가능 여부도 필요)
+- 도서 정보 수정 : 도서 검색 후, 도서를 선택하여 정보 수정 가능
+- 도서 삭제 : 도서 검색 후, 도서를 선택하여 삭제 가능
+- 도서 대출 : 입력된 사용자의 대출 기록 추가, 도서 상태를 '대출 중'으로 변경
+- 도서 반납 : 입력된 사용자의 대출 기록 삭제, 도서 상태를 '대출 가능'으로 변경, 연체했다면 일정 기간 대출 불가
+- 대출 예약 : 입력된 사용자에게 대출 예약 설정 가능, 예약된 도서가 '대출 가능' 상태가 되면 '예약 중'으로 변경
+- 유저 등록 : 새로운 관리자 또는 유저를 등록 가능
+- 리포트 : 도서 대출 현황, 연체 중인 도서 목록, 대출 횟수가 많은 도서 목록, 유저 수, 문의 내역 등 확인 가능
+
+일반 유저
+- 도서 검색, 대출 예약/연장, 내 정보(대출/예약 내역, 대출 가능 도서량 등) 확인, 회원 등록 / 로그인 / 로그아웃
+- 도서 검색 : 비회원도 가능, 관리자 모드와 동일(수정, 삭제는 불가)
+- 회원 등록 : ID, pw, 이름, 전화번호, email을 입력받아 회원 등록.
+- 로그인 / 로그아웃 : ID, pw를 입력받아 로그인
+- 내 정보 : 자신 계정의 대출 내역, 예약 내역, 대출 가능 도서량 확인 가능
+- 대출 예약 : 로그인 상태라면 도서 검색시 대출 예약 기능 이용 가능
+- 대출 연장 : '내 정보'에서 대출 기간 연장 가능, 다른 유저가 예약한 상태라면 연장 불가
+- 도서 반납 : '내 정보'에서 대출한 도서 반납 가능.
+- 문의 기능 : 새 도서 구매 요구, 대출 관련 문의, 시설 문의 등 타입을 설정하여 관리자에게 메시지 전달 가능.
+
+3. DB 테이블
+
+테이블 명 : BOOK
+컬럼 : 
+BOOK_ID      NUMBER   도서 ID - PK
+NAME      VARCHAR2   도서 명
+WRITER      VARCHAR2   저자
+CATEGORY   VARCHAR2   카테고리
+PUBLISHER   VARCHAR2   출판사
+PUB_DATE   DATE      출판일
+STATE      VARCHAR2   도서 상태(정상, 대출 중, 예약 중, 분실)
+
+IMAGE      ????      표지 이미지 - NULLABLE
+
+
+유저 정보 관리 테이블
+테이블 명 : USER_INFO
+컬럼 : 
+USER_ID      VARCAHR2   유저 ID - PK
+PW      VARCHAR2   비밀번호
+NAME      VARCHAR2    이름
+PHONE      VARCHAR2    전화번호
+EMAIL       VARCHAR2   이메일
+AUTH      VARCHAR2   권한 (ADMIN / USER)  - default = USER 
+
+
+
+테이블 명 : BALCK_LIST
+컬럼 : 
+USER_ID       VARCHAR2   유저 ID - PK
+BAN_DATE   DATE      대출 금지당한 날짜
+RELEASE_DATE   DATE      대출 금지 해제 날짜      
+
+
+대출 / 예약 도서
+테이블 명 : CHECK_OUT
+컬럼 : 
+BOOK_ID      NUMBER   도서 ID   - PK
+USER_ID      VARCHAR2   유저 ID   - FK
+STATE      VARCHAR2   대출 / 예약 - FK
+CHECK_OUT_DATE   DATE      대출 일자
+CHECK_IN_DATE   DATE      반납 예정 일자
+
+
+
+테이블 명 : REQUIREMENT
+컬럼 :
+MSG_ID      NUMBER      요구사항 ID - PK
+TITLE      VARCHAR2   요구사항 제목
+CONTENT   VARCHAR2   요구사항 내용
+TYPE      VARCHAR2   문의 종류
+DATE      DATE      문의 날짜
+USER_ID      VARCHAR2   문의자 ID - FK
+ISREAD      NUMBER      메시지를 읽었는지 여부
+
+==> 게시판 형식으로 변경
+postId
+postTitle
+postContent
+userId
+tag
+view
+replyList<replyId>
+writeDate
+
+reply
+replyId
+postId
+userId
+content
+writeDate
+
+4. 데이터 구조(VO)
+BookVO
+bookId (String) : 도서 ID
+name (String) : 도서 명
+writer (String) : 저자
+category (String) : 카테고리
+publisher (String) : 출판사
+pubDate (String) : 출판일
+state (String) : 도서 상태
+
+UserVO
+userId    (String)    유저 ID
+pw    (String)   비밀번호
+name   (String)   이름
+phone   (String)   전화번호
+email   (String)   이메일
+
+
+5. 클래스 명세서(생략 가능)
+Main.java : LibraryView 호출
+LibraryView.java : UI 클래스, GUI로 화면 구현
+
+BookVO.java : 도서의 Model 클래스
+UserVO.java : 유저의 Model 클래스
+
+LibraryDAO.java 
+= DAO 인터페이스. 일반 유저의 기능 메서드 정의
+
+LibraryAdminDAO.java 
+= DAO 인터페이스. 관리자의 추가 기능 메서드 정의
+
+LibraryDAOImple.java 
+= LibraryDAO implements 클래스. DB에 접근하여 일반 유저의 도서 검색, 대출, 내 정보 확인 기능 수행.
+
+LibraryAdminDAOImple.java 
+= LibraryDAOImple의 기능을 상속받고, LibraryAdminDAO을 구현한 클래스. 도서 등록, 수정, 삭제, 유저 등록, 리포트 확인 기능 수행.
+
+OracleQuery.java
+= Oracle DB 정보 인터페이스, DB 연결을 위한 상수. 사용자 정보, 테이블 및 컬럼 정보. 쿼리 작성
+
+
+
+할 일 : 회원가입, 로그인, 로그아웃
+로그인
+1. 유저가 우측 하단의 로그인 버튼을 클릭하여 로그인 창으로 이동
+2. ID, PW를 입력받아 DB 조회
+3. 유효한 사용자일 경우, 계정 정보를 DB로부터 읽어오고 메인 화면으로 이동
+4. 유효하지 않은 사용자일 경우, 입력창 하단에 메시지 출력
+
+회원가입
+1. 로그인 창의 회원가입 버튼 클릭시 회원정보를 입력받는 창으로 변경
+2. 입력 형식이 맞으면 회원가입 성공
+3. 안맞으면 해당 입력란 옆에 에러 메시지 출력
+
+화면 상단에 검색창 배치
+검색시, 그 하단에 검색 결과 출력
+검색 결과 클릭시 새 프레임에 자세한 정보 출력, 관리자면 수정, 삭제 가능
+
+
+OracleBookQuery
+
+ 도서 대출 : 입력된 사용자의 대출 기록 추가, 도서 상태를 '대출 중'으로 변경
+INSERT CHECK_OUT
+- 도서 반납 : 입력된 사용자의 대출 기록 삭제, 도서 상태를 '대출 가능'으로 변경, 연체했다면 일정 기간 대출 불가
+- 대출 예약 : 입력된 사용자에게 대출 예약 설정 가능, 예약된 도서가 '대출 가능' 상태가 되면 '예약 중'으로 변경
+리포트 : 도서 대출 현황, 연체 중인 도서 목록, 대출 횟수가 많은 도서 목록, 유저 수, 문의 내역 등 확인 가능
+일반 유저
+- 도서 검색, 대출 예약/연장, 내 정보(대출/예약 내역, 대출 가능 도서량 등) 확인
+대출 예약 : 로그인 상태라면 도서 검색시 대출 예약 기능 이용 가능
+- 대출 연장 : '내 정보'에서 대출 기간 연장 가능, 다른 유저가 예약한 상태라면 연장 불가
+- 도서 반납 : '내 정보'에서 대출한 도서 반납 가능.
+- 
+
+대출 반납 예약 구현
+대출 : 책을 선택 후 대출 클릭
+-> 대출용 dialog 출력 ( 도서 정보 출력)
+- 대여중이라면 반납예정일 출력해주고 대여 불가 = SELECT 반납예정일 FROM CHECK_OUT WHERE BOOK_ID = ?
+- set 상태일 때만 대여 가능
+- 예약중이라면 예약자의 반납예정일 출력해주고 대여 불가 = 위와 동일
+-> 대여하기 버튼 클릭하여 대여 = INSERT INTO CHECK_OUT 
+-> 취소 버튼 클릭시, 변화 없이 다이얼로그 종료
+ 
+CHECK_OUT 테이블에 INSERT, BOOK 테이블의 STATE 값 UPDATE
+
+반납 : '내 정보'에서 테이블에 표시된 책을 클릭 -> 반납 버튼 클릭
+예약 : 검색창에 검색 -> OUT 상태인 책 선택 후 대출 클릭? 하면 예약창 
+
+
+SELECT CHECK_IN_DATE FROM CHECK_OUT
+WHERE BOOK_ID = ?;
+? = BOOK_ID
+
+
+해야할 것
+
+대출 테이블 트리거들
+CHECK_OUT에 INSERT시 BOOK 의 STATE도 같은 값으로 변경 
+
+CHECK_OUT에서 DELETE시 BOOK의 STATE를 SET으로 변경 X
+ -> 대출 DELETE면 SET으로 변경
+-> 예약한 책을 반납시 -> 
+->  예약 DELETE면 -> 대여로 인한 DELETE면 OUT으로 변경(어차피 예약 DELETE 후 대여 INSERT 추가하니까 상관없을듯)
+	ㄴ 예약 기간 만료로 인한 DELETE면 SET으로 변경
+= 예약 DELETE시 => 대여로 인한 DELETE는 신경 X, 어떤 DELETE라도 발동시 SET으로 변경
+
+
+예약 기능 구현
+ㄴ 대출 중인 도서를 예약 가능 : 대출 창에서 구현해야 할듯 == 대출 상태면 예약 버튼 활성화
+ㄴ 예약된 도서는 반납되더라도 다른 사람이 대출 불가
+ㄴ 자신이 예약한 도서라면 -> 대출 버튼 활성화 (SELECT USER_ID FROM CHECK_OUT WHERE BOOK_ID = ? AND STATE = 'RESERVED'
+ -> 클릭시 대출 기능 진행 
+	ㄴ CHECK_OUT 테이블의 PRIMARY KEY를 복합키(BOOK_ID, STATE)로 변경, 대출 상태와 예약 상태를 따로 관리 
+	업데이트시 트리거 발동 -> BOOK 테이블 수정 
+ㄴ 아니라면 -> 비활성화
+
+책의 상태
+- 기본 SET
+- 대출중 OUT
+- 대출 + 예약중 RESERVED
+- 대출가능 + 예약중 SET(RESERVED)
+- 이용불가 LOST
+
+
+대출
+- SET 상태면 OUT으로 변경
+ BOOK.STATE = SET이면 INSERT, 
+==> INSERT 트리거 -> BOOK.STATE = OUT
+- SET(RESERVED) 상태면 OUT으로 변경
+ BOOK.STATE = SET(RESERVED) 상태면 OUT으로 변경, CHECK_OUT 
+==> DELETE 후 INSERT => DELETE 트리거 -> BOOK.STATE = SET, INSERT 트리거 -> BOOK.STATE = OUT
+
+예약
+- OUT 상태면 RESERVED로 변경
+ BOOK.STATE = OUT 이면 INSERT
+==> INSERT 트리거 -> BOOK.STATE = RESERVED
+
+반납
+- OUT 상태면 SET으로 변경
+ BOOK.STATE = OUT 이면 DELETE
+== DELETE 트리거 -> BOOK.STATE = SET
+- RESERVED 상태면 SET(RESERVED)로 변경
+ BOOK.STATE = RESERVED 이면 
+== 
+ 
+
+
+CHECKOUT에는 ACTION만 저장
+책의 진짜 상태는 BOOK에
+대출 : BOOK.STATE가 SET인 상태 : CHECK_OUT에 OUT 열 추가
+-> BOOK.STATE = OUT
+BOOK.STATE가 SET(RESERVED)인 상태 : CHECK_OUT UPDATE 
+-> BOOK.STATE = OUT
+
+예약 : BOOK.STATE = OUT 상태 : CHECK_OUT에 RESERVED 열 추가
+-> BOOK.STATE = RESERVED
+
+반납 : BOOK.STATE = OUT 상태 : CHECK_OUT DELETE, BOOK.STATE = SET
+BOOK.STATE = RESERVED 상태 : 
+CHECK_OUT UPDATE
+BOOK.STATE = SET(RESERVED)
+
+RESERVED일때 DELETE => 
+
+
+내 정보 기능 구현
+
+- checkout 의 user_id가 자신인 모든 열과 그 book_id에 해당하는 book 테이블의 정보
+SELECT * FROM CHECK_OUT JOIN BOOK
+ON CHECK_OUT.BOOK_ID = BOOK.BOOK_ID
+
+ㄴ 도서 반납
+ㄴ 대출 기간 연장
+자신 계정의 대출 내역, 예약 내역, 대출 가능 도서량 확인 가능
++ 블랙리스트
+
+
+트리거 사용 X
+
+대출
+BOOK.STATE가 SET이면 
+- CHECK_OUT에 OUT 열 추가, BOOK.STATE = OUT 
+1) INSERT INTO CHECK_OUT VALUES(); 
+2) UPDATE BOOK SET BOOK.STATE = 'OUT'
+WHERE BOOK_ID = ?;
+
+BOOK.STATE가 SET(RESERVED)이면
+- CHECK_OUT에 OUT 열 추가, BOOK.STATE = OUT
+
+로그인시 할것
+블랙리스트 확인
+CHECKOUT 불러오기
+
+
+테이블 분리
+SET : 대출 가능 
+BOOK 테이블의 STATE를 OUT으로 UPDATE
+CHECKOUT 테이블에 INSERT
+
+RESERVED : 예약자만 대출 가능
+예약한 책인지 확인 
+
+예약
+BOOK.STATE가 OUT이면
+- CHECK_OUT에 RESERVED 열 추가, BOOK.STATE = RESERVED
+
+반납
+BOOK.STATE가 OUT이면
+- CHECK_OUT의 열 삭제, BOOK.STATE = SET
+3) DELETE CHECK_OUT WHERE BOOK_ID = ? AND STATE = ?
+
+BOOK.STATE가 RESERVED이면
+- CHECK_OUT의 열 삭제, BOOK.STATE = SET(RESERVED)
+
+
+내 정보
+CHECK_OUT의 USER_ID가 일치하는 모든 열과, 그 BOOK_ID에 해당하는 BOOK 의 모든 열 출력
+
+SELECT * FROM CHECK_OUT JOIN BOOK ON CHECK_OUT.BOOK_ID = BOOK.BOOK_ID;
+
+연장
+BOOK.STATE가 OUT일 때, CHECK_IN_DATE - CHECK_OUT_DATE가 14 이하일 때,
+  CHECK_IN_DATE를 현재 시간 +7일로 변경
+UPDATE CHECK_OUT SET CHECK_IN_DATE = ? WHERE BOOK_ID = ?;
+
+
+
+자신이 대출한 책은 예약 못하게 변경
+
+대출 버튼 : 대여 가능 상태일 때만 활성화
+예약 버튼 : 대출 중이고 자신이 대출한 상태가 아닐 때에만 활성화
+
+
+로그인시, select min(checkindate) from checkout where userid = userid and state = 'out' 이 sysdate보다 작으면,
+insert into blacklist values ( userid, sysdate, sysdate +30);  isBan = true;
+
+로그인시, select releasedate from blacklist where userid = userid 의 결과가 있으면, 해당 결과와 sysdate를 비교,
+기간이 지났으면 delete blacklist where userid = userid
+아니면 글로벌 변수 isBan = true로 지정
+
+isBan = true면 대여 버튼, 예약 버튼 비활성화
+
+
+문의하기 버튼 클릭시 게시판으로 이동
+게시글 전체 요청
+SELECT POST_ID, POST_TITLE, USER_ID, TAG, VIEW, WRITE_DATE FROM POST
+
+게시글 1개 요청
+SELECT * FROM POST WHERE POST_ID = postId
+댓글 요청
+SELECT * FROM REPLY WHERE POST_ID = postId
+
+글 작성
+INSERT INTO POST VALUES (...,0 , NULL, );
+댓글 작성
+INSERT INTO REPLY VALUES ()
+
+
+
+
+==> 게시판 형식으로 변경
+postId
+postTitle
+postContent
+userId
+tag
+view
+writeDate
+replyList<replyId>
+
+
+reply
+replyId
+postId
+userId
+content
+writeDate
+
+
+
+
+
+
+- 리포트 : 도서 대출 현황, 연체 중인 도서 목록, 대출 횟수가 많은 도서 목록, 유저 수, 문의 내역 등 확인 가능
+
+

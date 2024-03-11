@@ -14,6 +14,7 @@ import javax.swing.table.TableModel;
 import Model.BookVO;
 import libManager.Controller.BookDAOImple;
 import libManager.Controller.UserDAOImple;
+import libManager.Controller.UserManagementService;
 import libManager.Interface.OracleBookQuery;
 
 import java.awt.event.ActionListener;
@@ -97,7 +98,7 @@ public class MyInfoDialog extends JDialog {
 	
 	private void printTable() {
 		// 입력받은 list를 table 컴포넌트에 출력
-		printedList = dao.selectAllInfoById(UserDAOImple.getCurrentUser().getUserId());
+		printedList = dao.selectAllInfoById(UserManagementService.getCurrentUser().getUserId());
 		tableModel.setRowCount(0);
 		ArrayList<String> ls;
 		for(int i = 0; i < printedList.size(); i++) {

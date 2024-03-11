@@ -27,6 +27,7 @@
 - 대출 연장 : '내 정보'에서 대출 기간 연장 가능, 다른 유저가 예약한 상태라면 연장 불가
 - 도서 반납 : '내 정보'에서 대출한 도서 반납 가능.
 - 문의 기능 : 새 도서 구매 요구, 대출 관련 문의, 시설 문의 등 타입을 설정하여 관리자에게 메시지 전달 가능.
+- 리포트 : 도서 대출 현황, 연체 중인 도서 목록, 대출 횟수가 많은 도서 목록, 유저 수, 문의 내역 등 확인 가능
 
 3. DB 테이블
 
@@ -90,7 +91,6 @@ postContent
 userId
 tag
 view
-replyList<replyId>
 writeDate
 
 reply
@@ -341,6 +341,38 @@ insert into blacklist values ( userid, sysdate, sysdate +30);  isBan = true;
 
 isBan = true면 대여 버튼, 예약 버튼 비활성화
 
+블랙리스트 기능
+연체시 ( = 빌린 도서 중 반납 예정일이 현재 시간보다 큰 도서가 존재할 경우)
+
+--> 대여 불가, 예약 불가
+
+대여, 예약 시도시, 
+-> 블랙 리스트에 등록되었는지? 등록되었다면 해제해야하는지? 등록 해야하는지?
+블랙리스트로부터 userid에 해당하는 열 select
+ㄴ 결과가 있다면 해제일과 현재 시간을 비교
+	ㄴ 해제일이 현재시간보다 큰 경우 -> 대여 불가
+	ㄴ 해제일이 현재시간보다 작은 경우 -> 블랙리스트에서 해당 유저id 열 delete, 대여 가능
+ㄴ 결과가 없다면 
+	ㄴ 빌린 책이 있는 경우,  checkout으로부터 userid에 해당하고 state가 out인 열의 가장 빠른 반납일 select
+		ㄴ 결과 중 현재시간보다 작은 값 존재시 -> 블랙리스트에 insert, 대여 불가
+	ㄴ 빌린 책이 없는 경우, 대여 가능
+
+필요 쿼리
+블랙리스트에 user 등록, 검색, 삭제
+Insert into black_list values (userId, ban_date, release_date);	registerBlackList
+select * from black_list where userId = ?	searchBlackList
+select MIN(check_in_date) from check_out where userId = ? and state = ?(out)	getCheckinDate
+delete black_list where userId = ?	deleteFromBlackList
+
+boolean checkBlackList(userId)	대여 가능하면 return true, 불가능하면 false
+
+service 
+isBan() : 블랙리스트 등록 여부 체크
+
+getBanInfo() : 블랙리스트 등록여부 체크 : 등록정보 리턴
+
+
+
 
 문의하기 버튼 클릭시 게시판으로 이동
 게시글 전체 요청
@@ -365,23 +397,66 @@ postTitle
 postContent
 userId
 tag
-view
+views
 writeDate
-replyList<replyId>
 
 
 reply
 replyId
 postId
 userId
-content
+replyContent
 writeDate
 
 
+글쓰기, 글삭제, 글수정, 글 전체 검색, 제목 작성자 태그 검색
+댓글쓰기, 댓글삭제, 댓글수정
+
+글쓰기
+insert into post values(...);
+
+글삭제
+delete post where postId = ?
+권한이 admin 또는 작성자 id = userId인 경우에만 가능
+
+글수정
+update post set (...) where postId = ?
+권한이 작성자 id = userId인 경우에만 가능
+
+글 전체 검색
+select * from (
+	select post.*, row_number() over (order by writeDate desc) from post
+	) where row_number() over (order by writeDate desc) between ? and ?
+
+글 ID 지정 검색
+select * from post where postId = ?
+
+글 USERID, TITLE, TAG 지정 검색
+
+글 지정 댓글 검색
+select * from reply where postId = ? ORDER BY WRITE_DATE
+
+댓글 쓰기
+댓글 삭제
+댓글 수정
+
+OracleBoardQuery : 게시판 관련 쿼리 interface
+BoardDAO : 게시판 관련 통신 interface
+BoardDAOImple : 게시판 관련 통신 담당 인스턴스
+BoardManagementService : 
 
 
 
 
-- 리포트 : 도서 대출 현황, 연체 중인 도서 목록, 대출 횟수가 많은 도서 목록, 유저 수, 문의 내역 등 확인 가능
+버튼 종류
+writeMode
+작성한 글 쓰기, 취소
 
+ReadMode(admin)
+글 수정, 삭제
 
+ReadMode(common)
+뒤로 가기
+
+ListMode
+글 작성, 페이지 이동

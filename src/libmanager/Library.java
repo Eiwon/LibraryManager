@@ -20,6 +20,7 @@ import javax.swing.JTextField;
 import Model.BookVO;
 import libManager.Controller.BookDAOImple;
 import libManager.Controller.UserDAOImple;
+import libManager.Controller.UserManagementService;
 import libManager.Interface.OracleUserQuery;
 import libManager.Interface.UISize;
 import libManager.Interface.UserDAO;
@@ -102,7 +103,7 @@ public class Library implements UISize{
 		btnLogout.setText("로그아웃");
 		btnLogout.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				UserDAOImple.setCurrentUser(UserDAO.defaultUser);
+				UserManagementService.initUser();
 				btnRefresh();
 			}
 		});
@@ -169,7 +170,7 @@ public class Library implements UISize{
 		
 		btnMyInfo = new JButton();
 		btnMyInfo.setText("내 정보");
-		btnMyInfo.setBounds(12, 123, 119, 46);
+		btnMyInfo.setBounds(12, 66, 119, 46);
 		btnMyInfo.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				new MyInfoDialog();
@@ -178,20 +179,30 @@ public class Library implements UISize{
 		
 		panelForMember.add(btnMyInfo);
 		
+		JButton btnBoard = new JButton();
+		btnBoard.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				new BoardDialog();
+			}
+		});
+		btnBoard.setText("문의하기");
+		btnBoard.setBounds(12, 122, 119, 46);
+		panelForMember.add(btnBoard);
+		
 		btnRefresh();
 		
 		
 	}
 	
 	private void btnRefresh() {
-		if(UserDAOImple.getCurrentUser().equals(UserDAO.defaultUser)) {
+		if(UserManagementService.getUserId().equals("Guest")) {
 			btnLogin.setVisible(true);
 			btnLogout.setVisible(false);
 		}else {
 			btnLogin.setVisible(false);
 			btnLogout.setVisible(true);
 		}
-		if(UserDAOImple.getCurrentUser().getAuth().equals(OracleUserQuery.AUTH_ADMIN)) {
+		if(UserManagementService.getUserAuth().equals(OracleUserQuery.AUTH_ADMIN)) {
 			panelForAdmin.setVisible(true);
 		}else {
 			panelForAdmin.setVisible(false);

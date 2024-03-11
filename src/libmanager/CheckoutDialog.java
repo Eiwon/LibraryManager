@@ -11,6 +11,7 @@ import javax.swing.border.EmptyBorder;
 import Model.BookVO;
 import libManager.Controller.BookDAOImple;
 import libManager.Controller.UserDAOImple;
+import libManager.Controller.UserManagementService;
 import libManager.Interface.OracleBookQuery;
 
 import javax.swing.JTextPane;
@@ -62,7 +63,7 @@ public class CheckoutDialog extends JDialog {
 			}else {
 				btnCheckout.setEnabled(false);
 			}
-			if(vo.getState().equals(OracleBookQuery.BOOK_STATE_OUT) && !userId.equals(UserDAOImple.getCurrentUser().getUserId())) {
+			if(vo.getState().equals(OracleBookQuery.BOOK_STATE_OUT) && !userId.equals(UserManagementService.getUserId())) {
 				// 책이 '대출 중' 상태이고 자신이 대출한 상태가 아닐 때에만 예약 버튼 활성화
 				btnReserve.setEnabled(true);
 			}else{
@@ -70,7 +71,12 @@ public class CheckoutDialog extends JDialog {
 			}
 			btnCheckout.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					String userId = UserDAOImple.getCurrentUser().getUserId();
+					if(UserManagementService.isBan()) {
+						System.out.println("도서 대출 / 예약이 불가능한 상태입니다.");
+						return;
+					}
+					
+					String userId = UserManagementService.getUserId();
 					String state = OracleBookQuery.BOOK_STATE_OUT;
 					String outTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 					String returnTime 
@@ -84,7 +90,11 @@ public class CheckoutDialog extends JDialog {
 				
 			btnReserve.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-				String userId = UserDAOImple.getCurrentUser().getUserId();
+				if(UserManagementService.isBan()) {
+					System.out.println("도서 대출 / 예약이 불가능한 상태입니다.");
+					return;
+				}
+				String userId = UserManagementService.getUserId();
 				String state = OracleBookQuery.BOOK_STATE_RSV;
 				LocalDateTime.parse(returnDate.replace(' ', 'T')).plusDays(7);
 				String reserveTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));

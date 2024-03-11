@@ -12,6 +12,7 @@ import javax.swing.event.DocumentListener;
 import Model.UserVO;
 import libManager.Controller.UserDAOImple;
 import libManager.Interface.UISize;
+import libManager.Controller.UserManagementService;
 
 import javax.swing.JLabel;
 import javax.swing.JTextField;
@@ -100,7 +101,8 @@ public class LoginFrame extends JFrame {
 					System.out.println("잘못된 아이디 또는 비밀번호 입니다.");
 				}else {
 					System.out.println("로그인 성공");
-					UserDAOImple.setCurrentUser(curUser);
+					
+					UserManagementService.setCurrentUser(curUser);
 					dispose();
 				}
 			}

@@ -28,16 +28,25 @@ import javax.swing.JTextField;
 import javax.swing.JComboBox;
 
 public class BoardDialog extends JDialog {
-
+	private static final int LISTMODE = 1;
+	private static final int WRITEMODE = 2;
+	private static final int READMODE = 3;
+	
+	private static final int SEARCHALL = -1;
+	private static final int SEARCHTITLE = 0;
+	private static final int SEARCHTAG = 1;
+	private static final int SEARCHWRITER = 2;	
+	
 	private JPanel panelList;
 	private JPanel panelWrite;
 	private JTable table;
 	private DefaultTableModel tableModel;
 	private String[] tableCol = {"글 번호", "분류", "제목", "작성자", "작성일", "조회수"};
 	private Object[] post = new Object[tableCol.length];
-	private static final int LISTMODE = 1;
-	private static final int WRITEMODE = 2;
-	private static final int READMODE = 3;
+	private int currentPage = 1;
+	private int searchType = SEARCHALL;
+	private String curTarget = "";
+	
 	private JTextField txtTitle;
 	private JTextField txtContent;
 	private BoardDAOImple dao;
@@ -58,13 +67,16 @@ public class BoardDialog extends JDialog {
 	private JComboBox cbxTarget;
 	private JTextField txtTarget;
 	private JButton btnSearch;
+	private JTextField textField;
 	
 	public BoardDialog() {
 		dao = BoardDAOImple.getInstance();
+		printedList = dao.selectPage(currentPage);
 		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		setVisible(true);
 		setBounds(100, 100, 952, 646);
 		getContentPane().setLayout(null);
+		setAlwaysOnTop(true);
 		setWritePanel();
 		setListPanel();
 		setReadPanel();
@@ -125,6 +137,7 @@ public class BoardDialog extends JDialog {
 		JPanel panelPageList = new JPanel();
 		panelPageList.setBounds(44, 464, 872, 38);
 		panelWrite.add(panelPageList);
+		
 	}
 	
 	private void setReadPanel() {
@@ -244,18 +257,21 @@ public class BoardDialog extends JDialog {
 		btnSearch = new JButton("검색");
 		btnSearch.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				currentPage = 1;
+				searchType = cbxTarget.getSelectedIndex();
+				curTarget = txtTarget.getText();
 				search();
 			}
 		});
 		btnSearch.setBounds(395, 10, 85, 41);
 		panelSearch.add(btnSearch);
 		
+		
 		printTable();
 		
 	}
 	//"글 번호", "분류", "제목", "작성자", "작성일", "조회수"
 	private void printTable() {
-		printedList = dao.selectPage(1);
 		tableModel.setRowCount(0);
 		for(PostVO vo : printedList) {
 			post[0] = String.valueOf(vo.getId());
@@ -331,6 +347,16 @@ public class BoardDialog extends JDialog {
 	}
 	
 	private void search() {
-		String category = cbx
-	}
+		if(searchType == SEARCHTITLE) {
+			printedList = dao.selectPostByTitle(curTarget, currentPage);
+		}else if(searchType == SEARCHWRITER) {
+			printedList = dao.selectPostByUid(curTarget, currentPage);
+		}else if(searchType == SEARCHTAG) {
+			printedList = dao.selectPostByTag(curTarget, currentPage);
+		}else {
+			printedList = dao.selectPage(currentPage);
+		}
+		System.out.println(printedList.toString());
+		printTable();
+	} // end search
 }

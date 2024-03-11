@@ -191,7 +191,7 @@ public class BoardDAOImple implements BoardDAO, OracleBoardQuery{
 			DriverManager.registerDriver(new OracleDriver());
 			conn = DriverManager.getConnection(URL, USER, PASSWORD);
 			pstmt = conn.prepareStatement(SQL_SELECT_POST_BY_UID);
-			pstmt.setString(1, userId);
+			pstmt.setString(1, '%' + userId + '%');
 			pstmt.setInt(2, (page -1) *10 +1);
 			pstmt.setInt(3, page *10);
 			
@@ -224,7 +224,7 @@ public class BoardDAOImple implements BoardDAO, OracleBoardQuery{
 			DriverManager.registerDriver(new OracleDriver());
 			conn = DriverManager.getConnection(URL, USER, PASSWORD);
 			pstmt = conn.prepareStatement(SQL_SELECT_POST_BY_TITLE);
-			pstmt.setString(1, title);
+			pstmt.setString(1, '%' + title + '%');
 			pstmt.setInt(2, (page -1) *10 +1);
 			pstmt.setInt(3, page *10);
 			

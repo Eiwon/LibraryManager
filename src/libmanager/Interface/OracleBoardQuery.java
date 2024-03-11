@@ -56,7 +56,7 @@ public interface OracleBoardQuery {
 	// 게시글 USER ID 지정 검색
 	public static final String SQL_SELECT_POST_BY_UID = "SELECT * FROM ( SELECT " + TABLE_POST
 			+ ".*, ROW_NUMBER() OVER (ORDER BY " + WRITE_DATE + " DESC) AS RN FROM " + TABLE_POST
-			+ " WHERE " + USER_ID + " = %?%) WHERE RN BETWEEN ? AND ?";
+			+ " WHERE " + USER_ID + " LIKE ?) WHERE RN BETWEEN ? AND ?";
 	// 게시글 TAG 지정 검색
 	public static final String SQL_SELECT_POST_BY_TAG = "SELECT * FROM ( SELECT " + TABLE_POST
 			+ ".*, ROW_NUMBER() OVER (ORDER BY " + WRITE_DATE + " DESC) AS RN FROM " + TABLE_POST
@@ -64,7 +64,7 @@ public interface OracleBoardQuery {
 	// 게시글 TITLE 지정 검색
 	public static final String SQL_SELECT_POST_BY_TITLE = "SELECT * FROM ( SELECT " + TABLE_POST
 			+ ".*, ROW_NUMBER() OVER (ORDER BY " + WRITE_DATE + " DESC) AS RN FROM " + TABLE_POST
-			+ " WHERE " + POST_TITLE + " = %?%) WHERE RN BETWEEN ? AND ?";
+			+ " WHERE " + POST_TITLE + " LIKE ?) WHERE RN BETWEEN ? AND ?";
 
 	// 게시글 ID 지정 댓글 검색
 	public static final String SQL_SELECT_REPLY_BY_PID = "SELECT * FROM ( SELECT " + TABLE_REPLY

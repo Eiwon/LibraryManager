@@ -1,9 +1,9 @@
-package libManager.Interface;
+package lib.Interface;
 
 import java.util.ArrayList;
 
-import Model.PostVO;
-import Model.ReplyVO;
+import lib.model.PostVO;
+import lib.model.ReplyVO;
 
 public interface BoardDAO {
 	
@@ -32,7 +32,7 @@ public interface BoardDAO {
 	public ArrayList<PostVO> selectPostByTag(String tag, int page);
 	
 	// 글 id 지정 댓글 검색
-	public ArrayList<ReplyVO> selectReplyById(int replyId);
+	public ArrayList<ReplyVO> selectReplyById(int replyId, int page);
 	
 	// 댓글 쓰기
 	public int insertReply(ReplyVO vo);
@@ -41,5 +41,5 @@ public interface BoardDAO {
 	public int updateReply(ReplyVO vo);
 	
 	// 댓글 삭제
-	public int deleteReply(ReplyVO vo);
+	public int deleteReply(int replyId);
 }

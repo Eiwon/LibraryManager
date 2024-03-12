@@ -1,8 +1,9 @@
-package libManager.Interface;
+package lib.Interface;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 
-import Model.UserVO;
+import lib.model.UserVO;
 
 public interface UserDAO {
 	
@@ -12,11 +13,11 @@ public interface UserDAO {
 	
 	public UserVO selectWithPw(String userId, String pw);
 	
-	public int registerBlackList(String userId, String banDate, String releaseDate);
+	public int registerBlackList(String userId, LocalDateTime banDate, LocalDateTime releaseDate);
 	
 	public String[] searchBlackList(String userId);
 	
 	public int deleteFromBlackList(String userId);
 	
-	public String getCheckinDate(String userId);
+	public LocalDateTime getCheckinDate(String userId);
 }

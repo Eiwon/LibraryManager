@@ -1,16 +1,18 @@
-package libManager.Controller;
+package lib.controller;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 
-import Model.UserVO;
-import libManager.Interface.OracleBookQuery;
-import libManager.Interface.OracleUserQuery;
-import libManager.Interface.UserDAO;
+import lib.Interface.OracleBookQuery;
+import lib.Interface.OracleUserQuery;
+import lib.Interface.UserDAO;
+import lib.model.UserVO;
 import oracle.jdbc.OracleDriver;
 
 public class UserDAOImple implements UserDAO, OracleUserQuery{
@@ -134,7 +136,7 @@ public class UserDAOImple implements UserDAO, OracleUserQuery{
 	}
 
 	@Override
-	public int registerBlackList(String userId, String banDate, String releaseDate) {
+	public int registerBlackList(String userId, LocalDateTime banDate, LocalDateTime releaseDate) {
 		System.out.println("userdaoimple : insertBlackList");
 		int res = 0;
 		try {
@@ -143,8 +145,8 @@ public class UserDAOImple implements UserDAO, OracleUserQuery{
 			pstmt = conn.prepareStatement(SQL_INSERT_BLACK);
 			
 			pstmt.setString(1, userId);
-			pstmt.setString(2, banDate);
-			pstmt.setString(3, releaseDate);
+			pstmt.setTimestamp(2, Timestamp.valueOf(banDate));
+			pstmt.setTimestamp(3, Timestamp.valueOf(releaseDate));
 			
 			res = pstmt.executeUpdate();
 			if(res == 1) {
@@ -167,8 +169,7 @@ public class UserDAOImple implements UserDAO, OracleUserQuery{
 	@Override
 	public String[] searchBlackList(String userId) {
 		System.out.println("userdaoimple : searchBlackList");
-		String[] res = new String[3];
-		int index = 0;
+		String[] res = null;
 		
 		try {
 			DriverManager.registerDriver(new OracleDriver());
@@ -176,10 +177,12 @@ public class UserDAOImple implements UserDAO, OracleUserQuery{
 			pstmt = conn.prepareStatement(SQL_SELECT_BY_USERID_FROM_BLACK);
 			pstmt.setString(1, userId);
 			ResultSet rs = pstmt.executeQuery();
-			
-			while(rs.next()) {
-				res[index] = rs.getString(index + 1);
-				index++;
+			LocalDateTime temp;
+			if(rs.next()) {
+				res = new String[3];
+				res[0] = rs.getString(1);
+				res[1] = rs.getTimestamp(2).toLocalDateTime().toString();
+				res[2] = rs.getTimestamp(3).toLocalDateTime().toString();
 			}
 			System.out.println("블랙리스트로부터 유저 검색 성공");
 			
@@ -194,8 +197,6 @@ public class UserDAOImple implements UserDAO, OracleUserQuery{
 				e.printStackTrace();
 			}
 		}
-		if(index == 0)
-			res = null;
 		
 		return res;
 	}
@@ -229,9 +230,9 @@ public class UserDAOImple implements UserDAO, OracleUserQuery{
 	} // deleteFromBlackList
 
 	@Override
-	public String getCheckinDate(String userId) {
+	public LocalDateTime getCheckinDate(String userId) {
 		System.out.println("userdaoimple : getCheckinDate");
-		String res = null;
+		LocalDateTime res = null;
 		
 		try {
 			DriverManager.registerDriver(new OracleDriver());
@@ -242,7 +243,7 @@ public class UserDAOImple implements UserDAO, OracleUserQuery{
 			ResultSet rs = pstmt.executeQuery();
 			
 			if(rs.next()) {
-				res = rs.getString(1);
+				res = rs.getTimestamp(1).toLocalDateTime();
 			}
 			System.out.println("가장 빠른 반납일 검색 성공");
 			

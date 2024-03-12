@@ -1,4 +1,4 @@
-package libManager;
+package lib.view;
 
 import java.awt.EventQueue;
 import java.awt.Window;
@@ -17,13 +17,13 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import javax.swing.JTextField;
 
-import Model.BookVO;
-import libManager.Controller.BookDAOImple;
-import libManager.Controller.UserDAOImple;
-import libManager.Controller.UserManagementService;
-import libManager.Interface.OracleUserQuery;
-import libManager.Interface.UISize;
-import libManager.Interface.UserDAO;
+import lib.Interface.OracleUserQuery;
+import lib.Interface.UISize;
+import lib.Interface.UserDAO;
+import lib.controller.BookDAOImple;
+import lib.controller.UserDAOImple;
+import lib.controller.UserManagementService;
+import lib.model.BookVO;
 
 import javax.swing.JPanel;
 

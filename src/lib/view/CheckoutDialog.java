@@ -1,4 +1,4 @@
-package libManager;
+package lib.view;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
@@ -8,11 +8,11 @@ import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
-import Model.BookVO;
-import libManager.Controller.BookDAOImple;
-import libManager.Controller.UserDAOImple;
-import libManager.Controller.UserManagementService;
-import libManager.Interface.OracleBookQuery;
+import lib.Interface.OracleBookQuery;
+import lib.controller.BookDAOImple;
+import lib.controller.UserDAOImple;
+import lib.controller.UserManagementService;
+import lib.model.BookVO;
 
 import javax.swing.JTextPane;
 import java.awt.event.ActionListener;
@@ -29,7 +29,7 @@ public class CheckoutDialog extends JDialog {
 	private JButton btnReserve;
 	private JButton btnExit;
 	private BookDAOImple dao = null;
-	private String returnDate;
+	private LocalDateTime returnDate;
 	
 	public CheckoutDialog(BookVO vo) {
 		dao = BookDAOImple.getInstance();
@@ -78,9 +78,9 @@ public class CheckoutDialog extends JDialog {
 					
 					String userId = UserManagementService.getUserId();
 					String state = OracleBookQuery.BOOK_STATE_OUT;
-					String outTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-					String returnTime 
-					= LocalDateTime.now().plusDays(MAX_CHECK_OUT_TIME).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+					LocalDateTime outTime = LocalDateTime.now();
+					LocalDateTime returnTime 
+					= outTime.plusDays(MAX_CHECK_OUT_TIME);
 						
 					dao.insertCheckoutBook(vo.getBookId(), userId, state, outTime, returnTime);
 					dao.updateByBookId(OracleBookQuery.BOOK_STATE_OUT, vo.getBookId());
@@ -96,12 +96,10 @@ public class CheckoutDialog extends JDialog {
 				}
 				String userId = UserManagementService.getUserId();
 				String state = OracleBookQuery.BOOK_STATE_RSV;
-				LocalDateTime.parse(returnDate.replace(' ', 'T')).plusDays(7);
-				String reserveTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-				String reserveEndTime = LocalDateTime.parse(returnDate.replace(' ', 'T')).plusDays(7).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-				System.out.println(reserveTime + " ~ " + reserveEndTime);
+				LocalDateTime reserveDate = LocalDateTime.now();
+				LocalDateTime reserveEndDate = returnDate.plusDays(7);
 					
-				dao.insertCheckoutBook(vo.getBookId(), userId, state, reserveTime, reserveEndTime);
+				dao.insertCheckoutBook(vo.getBookId(), userId, state, reserveDate, reserveEndDate);
 				dao.updateByBookId(OracleBookQuery.BOOK_STATE_RSV, vo.getBookId());
 				}
 			});
@@ -126,7 +124,7 @@ public class CheckoutDialog extends JDialog {
 		
 		if(vo.getState().equals(OracleBookQuery.BOOK_STATE_OUT) || vo.getState().equals(OracleBookQuery.BOOK_STATE_RSV)) {
 			returnDate = BookDAOImple.getInstance().selectCheckinDate(vo.getBookId());
-			contents =contents.concat("반납 예정일 : " + returnDate.substring(0, 10));
+			contents =contents.concat("반납 예정일 : " + returnDate.toString().substring(0, 10));
 		}
 		
 		txtBookInfo.setText(contents);

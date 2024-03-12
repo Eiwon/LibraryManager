@@ -1,9 +1,10 @@
-package libManager.Controller;
+package lib.controller;
 
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
-import Model.UserVO;
-import libManager.Interface.UserDAO;
+import lib.Interface.UserDAO;
+import lib.model.UserVO;
 
 public class UserManagementService {
 
@@ -54,7 +55,7 @@ public class UserManagementService {
 		String[] banInfo = dao.searchBlackList(userId);
 		
 		if(banInfo != null) { // 블랙리스트에 이미 등록된 유저라면
-			LocalDateTime releaseDate = LocalDateTime.parse(banInfo[3].replace(" ", "T"));
+			LocalDateTime releaseDate = LocalDateTime.parse(banInfo[3]);
 			if(LocalDateTime.now().isBefore(releaseDate)) { // 아직 해제일 전이라면 
 				return true;
 			}else {
@@ -62,14 +63,13 @@ public class UserManagementService {
 				return false;
 			}
 		}else { // 블랙리스트 미등록 유저라면
-			String checkinDate = dao.getCheckinDate(userId);
-			if(checkinDate != null) {
-				LocalDateTime earliestCheckinDate = LocalDateTime.parse(checkinDate.replace(" ", "T"));
+			LocalDateTime earliestCheckinDate = dao.getCheckinDate(userId);
+			if(earliestCheckinDate != null) {
 				if(LocalDateTime.now().isBefore(earliestCheckinDate)) { // 아직 가장 빠른 반납일 전이라면
 					return false;
 				}else {
-					dao.registerBlackList(currentUser.getUserId(), LocalDateTime.now().toString().replace("T", " "), 
-						LocalDateTime.now().plusDays(14).toString().replace("T", " "));
+					dao.registerBlackList(currentUser.getUserId(), LocalDateTime.now(), 
+						LocalDateTime.now().plusDays(14));
 					return true;
 				}
 			}else return false;

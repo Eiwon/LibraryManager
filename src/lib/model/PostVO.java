@@ -1,4 +1,4 @@
-package Model;
+package lib.model;
 
 import java.time.LocalDateTime;
 
@@ -9,9 +9,9 @@ public class PostVO {
 	private String userId;
 	private String tag;
 	private int views;
-	private String writeDate;
+	private LocalDateTime writeDate;
 	
-	public PostVO(int id, String title, String content, String userId, String tag, int views, String writeDate) {
+	public PostVO(int id, String title, String content, String userId, String tag, int views, LocalDateTime writeDate) {
 		this.id = id;
 		this.title = title;
 		this.content = content;
@@ -56,10 +56,10 @@ public class PostVO {
 	public void setViews(int views) {
 		this.views = views;
 	}
-	public String getWriteDate() {
+	public LocalDateTime getWriteDate() {
 		return writeDate;
 	}
-	public void setWriteDate(String writeDate) {
+	public void setWriteDate(LocalDateTime writeDate) {
 		this.writeDate = writeDate;
 	}
 	

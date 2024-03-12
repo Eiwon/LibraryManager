@@ -1,18 +1,28 @@
-package libManager;
+package lib.view;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JFileChooser;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
-import Model.BookVO;
-import libManager.Controller.BookDAOImple;
-import libManager.Interface.BookDAO;
+import lib.Interface.BookDAO;
+import lib.controller.BookDAOImple;
+import lib.controller.ImageManager;
+import lib.model.BookVO;
 
 import javax.swing.JLabel;
 import javax.swing.JTextField;
@@ -31,6 +41,10 @@ public class BookUpdateDialog extends JDialog {
 	private JLabel lblState;
 	private JTextField txtState;
 	private BookVO updateTarget;
+	private JButton btnAddImg;
+	private JLabel lblImg;
+	private ImageManager im;
+	private File selectedFile = null;
 	
 	public BookUpdateDialog() {
 		System.out.println("insert mode");
@@ -40,8 +54,11 @@ public class BookUpdateDialog extends JDialog {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				BookVO vo = validCheck();
-				if(vo != null)
+				if(vo != null) {
 					dao.insertBook(vo);
+					if(selectedFile != null)
+						im.putImage(selectedFile);
+				}
 				dispose();
 			}
 		});
@@ -56,7 +73,7 @@ public class BookUpdateDialog extends JDialog {
 		txtWriter.setText(updateTarget.getWriter());
 		txtCategory.setText(updateTarget.getCategory());
 		txtPublisher.setText(updateTarget.getPublisher());
-		txtPubDate.setText(updateTarget.getPubDate());
+		txtPubDate.setText(updateTarget.getPubDate().toString());
 		txtState.setText(updateTarget.getState());
 		
 		btnSubmit.setText("수정");
@@ -79,6 +96,7 @@ public class BookUpdateDialog extends JDialog {
 	public void init() {
 		
 		dao = BookDAOImple.getInstance();
+		im = ImageManager.getInstance();
 		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		setVisible(true);
 		setAlwaysOnTop(true);
@@ -91,7 +109,7 @@ public class BookUpdateDialog extends JDialog {
 		contentPanel.setLayout(null);
 		
 		JLabel lblName = new JLabel("제목");
-		lblName.setBounds(38, 80, 155, 34);
+		lblName.setBounds(38, 82, 155, 34);
 		contentPanel.add(lblName);
 		
 		JLabel lblWriter = new JLabel("저자");
@@ -142,7 +160,6 @@ public class BookUpdateDialog extends JDialog {
 			btnSubmit = new JButton("등록");
 			btnSubmit.setBounds(150, 541, 93, 66);
 			contentPanel.add(btnSubmit);
-			btnSubmit.setActionCommand("OK");
 			getRootPane().setDefaultButton(btnSubmit);
 		}
 		{
@@ -158,6 +175,24 @@ public class BookUpdateDialog extends JDialog {
 			txtState.setBounds(211, 462, 340, 54);
 			contentPanel.add(txtState);
 			txtState.setColumns(10);
+			
+			btnAddImg = new JButton("사진 등록");
+			btnAddImg.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					JFileChooser chooser = new JFileChooser();
+					int result = chooser.showOpenDialog(null);
+					if(result == JFileChooser.APPROVE_OPTION) {
+						selectedFile = chooser.getSelectedFile();
+						lblImg.setIcon(im.convToIcon(selectedFile));
+					}
+				}
+			});
+			btnAddImg.setBounds(12, 614, 97, 23);
+			contentPanel.add(btnAddImg);
+			
+			lblImg = new JLabel();
+			lblImg.setBounds(12, 512, 97, 95);
+			contentPanel.add(lblImg);
 			btnExit.addActionListener(new ActionListener() {
 				
 				@Override
@@ -174,13 +209,23 @@ public class BookUpdateDialog extends JDialog {
 		String writer = txtWriter.getText();
 		String category = txtCategory.getText();
 		String publisher = txtPublisher.getText();
-		String pubDate = txtPubDate.getText();
-		String state = txtState.getText();
+		System.out.println(txtPubDate.getText());
 		
-		if(name.length() * writer.length() * category.length() * publisher.length() * pubDate.length() * state.length() == 0) {
+		
+		LocalDate date = LocalDate.parse(txtPubDate.getText(), DateTimeFormatter.ofPattern("yyyyMMdd"));
+		
+		LocalDateTime pubDate = LocalDateTime.of(date, LocalTime.of(0, 0, 0));
+		String state = txtState.getText();
+		String img = null;
+		
+		if(name.length() * writer.length() * category.length() * publisher.length() * pubDate.getYear() * state.length() == 0) {
 			System.out.println("모든 필드 입력 필요");
 			return null;
 		}
-		return new BookVO(0, name, writer, category, publisher, pubDate, state, null);
+		if(selectedFile != null) {
+			img = selectedFile.getName();
+		}
+		
+		return new BookVO(0, name, writer, category, publisher, pubDate, state, img);
 	} // end validCheck
 }

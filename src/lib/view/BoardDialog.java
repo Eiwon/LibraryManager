@@ -1,4 +1,4 @@
-package libManager;
+package lib.view;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
@@ -10,10 +10,10 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 
-import Model.PostVO;
-import libManager.Controller.BoardDAOImple;
-import libManager.Controller.UserManagementService;
-import libManager.Interface.OracleUserQuery;
+import lib.Interface.OracleUserQuery;
+import lib.controller.BoardDAOImple;
+import lib.controller.UserManagementService;
+import lib.model.PostVO;
 
 import javax.swing.JList;
 import javax.swing.JTable;
@@ -39,6 +39,9 @@ public class BoardDialog extends JDialog {
 	
 	private JPanel panelList;
 	private JPanel panelWrite;
+	private JPanel panelRead;
+	private ReplyComp replyComp;
+	
 	private JTable table;
 	private DefaultTableModel tableModel;
 	private String[] tableCol = {"글 번호", "분류", "제목", "작성자", "작성일", "조회수"};
@@ -55,7 +58,6 @@ public class BoardDialog extends JDialog {
 	
 	private ArrayList<PostVO> printedList;
 	private PostVO selectedPost;
-	private JPanel panelRead;
 	private JTextField txtReadTitle;
 	private JTextField txtReadContent;
 	private JComboBox cbxRead;
@@ -77,14 +79,13 @@ public class BoardDialog extends JDialog {
 		setBounds(100, 100, 952, 646);
 		getContentPane().setLayout(null);
 		setAlwaysOnTop(true);
-		setWritePanel();
 		setListPanel();
+		setWritePanel();
 		setReadPanel();
 		setMode(LISTMODE);
 	}
 	
 	private void setWritePanel() {
-		
 		panelWrite = new JPanel();
 		panelWrite.setBounds(0, 0, 936, 597);
 		getContentPane().add(panelWrite);
@@ -110,6 +111,7 @@ public class BoardDialog extends JDialog {
 			public void actionPerformed(ActionEvent e) {
 				insertPost();
 				setMode(LISTMODE);
+				searchInit();
 			}
 		});
 		btnSubmit.setBounds(12, 10, 125, 31);
@@ -121,6 +123,7 @@ public class BoardDialog extends JDialog {
 				txtTitle.setText("");
 				txtContent.setText("");
 				setMode(LISTMODE);
+				searchInit();
 			}
 		});
 		btnCancel.setBounds(175, 14, 120, 27);
@@ -133,16 +136,11 @@ public class BoardDialog extends JDialog {
 		cbxWrite.addItem("기타");
 		cbxWrite.setBounds(44, 32, 100, 43);
 		panelWrite.add(cbxWrite);
-		
-		JPanel panelPageList = new JPanel();
-		panelPageList.setBounds(44, 464, 872, 38);
-		panelWrite.add(panelPageList);
-		
 	}
 	
 	private void setReadPanel() {
 		panelRead = new JPanel();
-		panelRead.setBounds(0, 0, 924, 597);
+		panelRead.setBounds(0, 0, 924, 600);
 		getContentPane().add(panelRead);
 		panelRead.setLayout(null);
 		
@@ -152,7 +150,7 @@ public class BoardDialog extends JDialog {
 		txtReadTitle.setColumns(10);
 		
 		txtReadContent = new JTextField();
-		txtReadContent.setBounds(24, 81, 847, 425);
+		txtReadContent.setBounds(24, 81, 847, 200);
 		panelRead.add(txtReadContent);
 		txtReadContent.setColumns(10);
 		
@@ -174,6 +172,7 @@ public class BoardDialog extends JDialog {
 		btnBack.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				setMode(LISTMODE);
+				searchInit();
 			}
 		});
 		btnBack.setBounds(258, 10, 97, 23);
@@ -184,6 +183,7 @@ public class BoardDialog extends JDialog {
 			public void actionPerformed(ActionEvent e) {
 				deletePost();
 				setMode(LISTMODE);
+				searchInit();
 			}
 		});
 		btnDelete.setBounds(149, 10, 97, 23);
@@ -194,11 +194,15 @@ public class BoardDialog extends JDialog {
 			public void actionPerformed(ActionEvent e) {
 				updatePost();
 				setMode(LISTMODE);
+				searchInit();
 			}
 		});
 		btnUpdate.setBounds(44, 10, 97, 23);
 		readBtnSet.add(btnUpdate);
 		
+		replyComp = new ReplyComp();
+		replyComp.setBounds(20, 270, 850, 250);
+		panelRead.add(replyComp);
 	}
 	
 	private void setListPanel() {
@@ -218,7 +222,7 @@ public class BoardDialog extends JDialog {
 		panelList.add(btnWrite);
 		
 		JScrollPane scrollPane = new JScrollPane();
-		scrollPane.setBounds(37, 25, 872, 471);
+		scrollPane.setBounds(37, 26, 872, 428);
 		panelList.add(scrollPane);
 		
 		tableModel = new DefaultTableModel(tableCol, 0) {
@@ -256,16 +260,50 @@ public class BoardDialog extends JDialog {
 		
 		btnSearch = new JButton("검색");
 		btnSearch.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				currentPage = 1;
-				searchType = cbxTarget.getSelectedIndex();
-				curTarget = txtTarget.getText();
-				search();
+			public void actionPerformed(ActionEvent e) { // 검색 타입과 검색값 변경 후 페이지를 1로 설정
+				searchInit();
 			}
 		});
 		btnSearch.setBounds(395, 10, 85, 41);
 		panelSearch.add(btnSearch);
 		
+		JPanel panelMove = new JPanel();
+		panelMove.setBounds(359, 464, 442, 47);
+		panelList.add(panelMove);
+		panelMove.setLayout(null);
+		
+		JButton btnToPrev = new JButton("이전");
+		btnToPrev.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				currentPage = Math.max(1, currentPage -1);
+				search();
+			}
+		});
+		btnToPrev.setBounds(12, 10, 66, 27);
+		panelMove.add(btnToPrev);
+		
+		JButton btnToNext = new JButton("다음");
+		btnToNext.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				currentPage++;
+				search();
+			}
+		});
+		btnToNext.setBounds(90, 10, 79, 27);
+		panelMove.add(btnToNext);
+		
+		JButton btnInit = new JButton("검색 조건 초기화");
+		btnInit.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				currentPage = 1;
+				curTarget = "";
+				searchType = SEARCHALL;
+				txtTarget.setText("");
+				search();
+			}
+		});
+		btnInit.setBounds(258, 12, 151, 23);
+		panelMove.add(btnInit);
 		
 		printTable();
 		
@@ -310,7 +348,7 @@ public class BoardDialog extends JDialog {
 	
 	private void insertPost() {
 		PostVO vo = new PostVO(0, txtTitle.getText(), txtContent.getText(), UserManagementService.getUserId(), 
-				cbxWrite.getSelectedItem().toString(), 0, "");
+				cbxWrite.getSelectedItem().toString(), 0, null);
 		if(dao.insertPost(vo) == 1) {
 			System.out.println("boardDialog : 글 등록 성공");
 			txtTitle.setText("");
@@ -321,6 +359,8 @@ public class BoardDialog extends JDialog {
 	private void readPost() {
 		int selectedPostId = printedList.get(table.getSelectedRow()).getId();
 		setMode(READMODE);
+		replyComp.setPostId(selectedPostId);
+		replyComp.printReply();
 		selectedPost = dao.selectPostById(selectedPostId);
 		cbxRead.setSelectedItem(selectedPost.getTag());
 		txtReadTitle.setText(selectedPost.getTitle());
@@ -338,7 +378,7 @@ public class BoardDialog extends JDialog {
 	
 	private void updatePost() {
 		PostVO vo = new PostVO(selectedPost.getId(), txtReadTitle.getText(), txtReadContent.getText(), "", 
-				cbxRead.getSelectedItem().toString(), 0, "");
+				cbxRead.getSelectedItem().toString(), 0, null);
 		dao.updatePost(vo);
 	}
 	
@@ -346,7 +386,7 @@ public class BoardDialog extends JDialog {
 		dao.deletePost(selectedPost.getId());
 	}
 	
-	private void search() {
+	private void search() { // 현재 설정된 검색 타입과 페이지에 따라 검색 후 테이블에 출력
 		if(searchType == SEARCHTITLE) {
 			printedList = dao.selectPostByTitle(curTarget, currentPage);
 		}else if(searchType == SEARCHWRITER) {
@@ -356,7 +396,13 @@ public class BoardDialog extends JDialog {
 		}else {
 			printedList = dao.selectPage(currentPage);
 		}
-		System.out.println(printedList.toString());
 		printTable();
 	} // end search
+	
+	private void searchInit() {
+		currentPage = 1;
+		searchType = cbxTarget.getSelectedIndex();
+		curTarget = txtTarget.getText();
+		search();
+	} // end searchInit
 }

@@ -1,4 +1,4 @@
-package libManager;
+package lib.view;
 
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
@@ -9,10 +9,10 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
-import Model.UserVO;
-import libManager.Controller.UserDAOImple;
-import libManager.Interface.UISize;
-import libManager.Controller.UserManagementService;
+import lib.Interface.UISize;
+import lib.controller.UserDAOImple;
+import lib.controller.UserManagementService;
+import lib.model.UserVO;
 
 import javax.swing.JLabel;
 import javax.swing.JTextField;

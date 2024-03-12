@@ -1,4 +1,4 @@
-package libManager.Interface;
+package lib.Interface;
 
 public interface OracleBookQuery {
 
@@ -33,21 +33,25 @@ public interface OracleBookQuery {
 	public static final String CATEGORY_DRAMA = "DRAMA";
 	public static final String CATEGORY_POETRY = "POETRY";
 	
-	// BOOK 테이블의 모든 데이터 검색
+	// BOOK 테이블의 모든 데이터를 페이지별 검색
 	public static final String SQL_SELECT_ALL = 
-			"SELECT * FROM " + TABLE_BOOK;
-	
+			"SELECT * FROM ( SELECT " + TABLE_BOOK + ".*, ROW_NUMBER() OVER (ORDER BY " + BOOK_ID + " DESC) AS RN FROM " 
+			+ TABLE_BOOK + " ) WHERE RN BETWEEN ? AND ?";
+			
 	// BOOK 테이블의 이름이 ?인 열 검색(name)
 	public static final String SQL_SELECT_BY_NAME = 
-			"SELECT * FROM " + TABLE_BOOK + " WHERE " + NAME +" LIKE ?";
+			"SELECT * FROM ( SELECT " + TABLE_BOOK + ".*, ROW_NUMBER() OVER (ORDER BY " + BOOK_ID + " DESC) AS RN FROM " 
+					+ TABLE_BOOK + " WHERE " + NAME + " LIKE ?) WHERE RN BETWEEN ? AND ?";
 	
 	// BOOK 테이블의 저자가 ?인 열 검색(writer)
 	public static final String SQL_SELECT_BY_WRITER = 
-			"SELECT * FROM " + TABLE_BOOK + " WHERE " + WRITER + " LIKE ?";
+			"SELECT * FROM ( SELECT " + TABLE_BOOK + ".*, ROW_NUMBER() OVER (ORDER BY " + BOOK_ID + " DESC) AS RN FROM " 
+					+ TABLE_BOOK + " WHERE " + WRITER + " LIKE ?) WHERE RN BETWEEN ? AND ?";
 	
 	// BOOK 테이블의 카테고리가 ?인 열 검색(category)
 	public static final String SQL_SELECT_BY_CATEGORY = 
-			"SELECT * FROM " + TABLE_BOOK + " WHERE " + CATEGORY + " LIKE ?";
+			"SELECT * FROM ( SELECT " + TABLE_BOOK + ".*, ROW_NUMBER() OVER (ORDER BY " + BOOK_ID + " DESC) AS RN FROM " 
+					+ TABLE_BOOK + " WHERE " + CATEGORY + " LIKE ?) WHERE RN BETWEEN ? AND ?";
 	
 	
 	
@@ -79,14 +83,14 @@ public interface OracleBookQuery {
 			"SELECT " + OracleUserQuery.USER_ID + " FROM " + TABLE_CHECK_OUT + " WHERE " + BOOK_ID + " = ? AND " + STATE + " = ?" ;
 	
 	// check_out 테이블로부터, 지정한 userId의 행 검색
-	//SELECT C.BOOK_ID, B.STATE, C.CHECK_OUT_DATE, C.CHECK_IN_DATE, B.NAME, B.WRITER, B.CATEGORY, C.STATE, B.IMAGE 
+	
+	//c.state, c.bookid, b.name, b.writer, b.category, b.state, c.checkoutdate, c.chechindate, b.image
 	public static final String SQL_SELECT_ALL_INFO_BY_USER =
 				"SELECT " + TABLE_CHECK_OUT + "." + STATE + ", " + TABLE_CHECK_OUT + "." + BOOK_ID +
 				", " + TABLE_BOOK + "." + NAME + ", " + TABLE_BOOK + "." + WRITER + ", " + TABLE_BOOK + "."
 				+ CATEGORY + ", " + TABLE_BOOK + "." + STATE + ", " + TABLE_CHECK_OUT + "." + CHECK_OUT_DATE 
 				+ ", " + TABLE_CHECK_OUT + "." + CHECK_IN_DATE + ", "+ TABLE_BOOK + "." + IMAGE + " FROM " + TABLE_CHECK_OUT + " JOIN " + TABLE_BOOK + " ON " + 
 				TABLE_CHECK_OUT + "." + BOOK_ID + " = " + TABLE_BOOK + "." + BOOK_ID + " WHERE " + OracleUserQuery.USER_ID + " = ?";
-		
 		//"대출/예약", "도서 코드", "제목", "저자", "카테고리", "상태", "대출/예약일", "반납/예약만료일"
 		
 	public static final String SQL_DELETE_BY_BOOK_ID = 

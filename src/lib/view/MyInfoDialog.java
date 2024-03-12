@@ -1,4 +1,4 @@
-package libManager;
+package lib.view;
 
 import java.awt.BorderLayout;
 
@@ -11,11 +11,11 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
-import Model.BookVO;
-import libManager.Controller.BookDAOImple;
-import libManager.Controller.UserDAOImple;
-import libManager.Controller.UserManagementService;
-import libManager.Interface.OracleBookQuery;
+import lib.Interface.OracleBookQuery;
+import lib.controller.BookDAOImple;
+import lib.controller.UserDAOImple;
+import lib.controller.UserManagementService;
+import lib.model.BookVO;
 
 import java.awt.event.ActionListener;
 import java.time.LocalDateTime;
@@ -138,12 +138,12 @@ public class MyInfoDialog extends JDialog {
 		int row = table.getSelectedRow();
 		if(row >= 0) {
 			ArrayList<String> targetInfo = printedList.get(row);
-			LocalDateTime checkoutTime = LocalDateTime.parse(targetInfo.get(6).replace(' ', 'T'));
-			LocalDateTime checkinTime = LocalDateTime.parse(targetInfo.get(7).replace(' ', 'T'));
+			LocalDateTime checkoutTime = LocalDateTime.parse(targetInfo.get(6));
+			LocalDateTime checkinTime = LocalDateTime.parse(targetInfo.get(7));
 			long day = ChronoUnit.DAYS.between(checkoutTime, checkinTime);
 		
 			if(targetInfo.get(5).equals(OracleBookQuery.BOOK_STATE_OUT) && day < 15) {
-				dao.updateCheckinDate(Integer.parseInt(targetInfo.get(1)), checkinTime.plusDays(7).toString().substring(0, 10));
+				dao.updateCheckinDate(Integer.parseInt(targetInfo.get(1)), checkinTime.plusDays(7));
 			}
 		}
 	} // end extendBook

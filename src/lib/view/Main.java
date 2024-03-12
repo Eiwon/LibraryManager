@@ -1,4 +1,4 @@
-package libManager;
+package lib.view;
 
 public class Main {
 

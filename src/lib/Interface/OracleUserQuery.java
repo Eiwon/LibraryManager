@@ -1,4 +1,4 @@
-package libManager.Interface;
+package lib.Interface;
 
 public interface OracleUserQuery {
 	public static final String URL = "jdbc:oracle:thin:@localhost:1521:xe"; // 접속할 오라클 경로

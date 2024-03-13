@@ -1,9 +1,6 @@
-package lib.Interface;
+package lib.module.board;
 
 import java.util.ArrayList;
-
-import lib.model.PostVO;
-import lib.model.ReplyVO;
 
 public interface BoardDAO {
 	

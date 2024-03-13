@@ -502,3 +502,63 @@ searchall, 이름검색, 내용검색, 태그검색 쿼리, bookdao 변경.
 연체 중인 도서 목록 : checkout 테이블로부터 상태가 out이고, 반납예정일자가 sysdate보다 큰 도서를 select
 
 
+
+
+할 일
+
+기능
+모든 좌석에 대해, 각 좌석이 사용 중인지 확인
+각 좌석의 종료까지 남은 시간 출력
+좌석 사용 : (자신이 사용 중인 좌석이 없을 경우)사용중이 아닌 좌석을 선택하여 현재시간 +4시간동안 점유
+좌석 반납 : 자신이 사용 중인 좌석을 반납
+좌석 연장 : 남은 시간이 2시간 미만일 때 사용 가능, 자신의 좌석 반납시간이 현재 시간의 +4시간
+
+
+ReadingRoomView.java
+각 좌석의 위치에 남은 시간 표시
+-> 모든 좌석 초록색 표시 후 list의 값이 양수면 빨강 + 해당 값 표시
+좌석을 선택 후 사용, 반납, 연장 버튼 클릭하여 기능 이용
+매 1분마다 모든 좌석의 남은 시간 1분씩 줄이는 쓰레드 생성
+
+
+controller
+입장시
+각 좌석의 종료시간 검색 : 
+1. DB로부터 seatid, startTime, endTime을 모두 select
+2. endTime과 now의 차이를 담은 리스트를 리턴
+
+
+
+좌석 사용
+1. insert into seat_time values (? ? ? ? ?)
+2. select * from seat_time where seatid = ? 
+
+좌석 반납
+1. delete seat_time where seatid = ?
+2. 해당 vo state 초기화
+
+좌석 연장
+1. select * from seat_time where seatid = ?
+2. update seat_time set end = ? where seatId = ? 
+
+좌석 
+
+RRDAO
+
+
+Query
+
+
+DB
+
+SEAT_ID NUMBER PK
+POSITION_X NUMBER
+POSITION_Y NUMBER
+user_id String
+START_TIME DATE
+END_TIME DATE
+state
+
+
+한 명당 1자리만 선택할 수 있게 조정
+

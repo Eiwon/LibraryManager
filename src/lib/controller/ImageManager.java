@@ -57,6 +57,7 @@ public class ImageManager {
 	} // end putImage
 	
 	public BufferedImage getImage(String imageName) {
+		System.out.println("ImageManager : getImage()");
 		File image = new File(IMAGE_DIR + File.separator + imageName);
 		try {
 			return ImageIO.read(image);
@@ -66,11 +67,12 @@ public class ImageManager {
 		}
 	} // end getImage
 	
-	public ImageIcon getImageToIcon(String imageName) {
+	public ImageIcon getImageToIcon(String imageName, int width, int height) {
+		System.out.println("ImageManager : getImageToIcon()");
 		File image = new File(IMAGE_DIR + File.separator + imageName);
 		try {
 		 	BufferedImage bi = ImageIO.read(image);
-		 	return new ImageIcon(bi.getScaledInstance(95, 95, Image.SCALE_DEFAULT));
+		 	return new ImageIcon(bi.getScaledInstance(width, height, Image.SCALE_DEFAULT));
 		} catch (IOException e) {
 			System.out.println("아이콘 읽어오기 실패 : " + e.toString());
 		}
@@ -78,6 +80,7 @@ public class ImageManager {
 	} // end getImageToIcon
 	
 	public ImageIcon convToIcon(File imageFile) {
+		System.out.println("ImageManager : convToIcon()");
 		ImageIcon icon = new ImageIcon(imageFile.getPath());
 		icon = new ImageIcon(icon.getImage().getScaledInstance(95, 95, Image.SCALE_DEFAULT));
 		return icon;

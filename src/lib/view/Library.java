@@ -22,8 +22,10 @@ import lib.Interface.UISize;
 import lib.Interface.UserDAO;
 import lib.controller.BookDAOImple;
 import lib.controller.UserDAOImple;
-import lib.controller.UserManagementService;
+import lib.controller.UserManager;
 import lib.model.BookVO;
+import lib.module.board.BoardDialog;
+import lib.module.room.ReadingRoom;
 
 import javax.swing.JPanel;
 
@@ -39,6 +41,7 @@ public class Library implements UISize{
 	private JPanel panelForMember;
 	private JButton btnBorrow;
 	private JButton btnMyInfo;
+	private JButton btnReadingRoom;
 	public Library() {
 		initialize();
 	}
@@ -103,7 +106,7 @@ public class Library implements UISize{
 		btnLogout.setText("로그아웃");
 		btnLogout.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				UserManagementService.initUser();
+				UserManager.initUser();
 				btnRefresh();
 			}
 		});
@@ -150,7 +153,7 @@ public class Library implements UISize{
 		
 		
 		panelForMember = new JPanel();
-		panelForMember.setBounds(1101, 177, 149, 186);
+		panelForMember.setBounds(1101, 177, 149, 242);
 		frame.getContentPane().add(panelForMember);
 		panelForMember.setLayout(null);
 		
@@ -189,20 +192,32 @@ public class Library implements UISize{
 		btnBoard.setBounds(12, 122, 119, 46);
 		panelForMember.add(btnBoard);
 		
+		btnReadingRoom = new JButton();
+		btnReadingRoom.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				new ReadingRoom();
+			}
+		});
+		btnReadingRoom.setText("열람실");
+		btnReadingRoom.setBounds(12, 178, 119, 46);
+		panelForMember.add(btnReadingRoom);
+		
 		btnRefresh();
 		
 		
 	}
 	
 	private void btnRefresh() {
-		if(UserManagementService.getUserId().equals("Guest")) {
+		if(UserManager.getUserAuth().equals("GUEST")) {
 			btnLogin.setVisible(true);
 			btnLogout.setVisible(false);
+			panelForMember.setVisible(false);
 		}else {
 			btnLogin.setVisible(false);
 			btnLogout.setVisible(true);
+			panelForMember.setVisible(true);
 		}
-		if(UserManagementService.getUserAuth().equals(OracleUserQuery.AUTH_ADMIN)) {
+		if(UserManager.getUserAuth().equals(OracleUserQuery.AUTH_ADMIN)) {
 			panelForAdmin.setVisible(true);
 		}else {
 			panelForAdmin.setVisible(false);

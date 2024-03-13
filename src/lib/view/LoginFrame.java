@@ -11,7 +11,7 @@ import javax.swing.event.DocumentListener;
 
 import lib.Interface.UISize;
 import lib.controller.UserDAOImple;
-import lib.controller.UserManagementService;
+import lib.controller.UserManager;
 import lib.model.UserVO;
 
 import javax.swing.JLabel;
@@ -98,11 +98,11 @@ public class LoginFrame extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				curUser = login();
 				if(curUser == null) {
-					System.out.println("잘못된 아이디 또는 비밀번호 입니다.");
+					new AlertDialog("잘못된 아이디 또는 비밀번호 입니다.");
 				}else {
-					System.out.println("로그인 성공");
+					new AlertDialog("로그인 성공");
 					
-					UserManagementService.setCurrentUser(curUser);
+					UserManager.setCurrentUser(curUser);
 					dispose();
 				}
 			}
@@ -229,14 +229,14 @@ public class LoginFrame extends JFrame {
 			UserVO vo = userDao.selectByID(txtSignupId.getText());
 			
 			if(vo == null){
-				System.out.println("사용할 수 있는 ID 입니다.");
+				new AlertDialog("사용할 수 있는 ID 입니다.");
 				validId = true;
 			}else {
-				System.out.println("이미 존재하는 ID 입니다.");
+				new AlertDialog("이미 존재하는 ID 입니다.");
 			}
 			
 		}else {
-			System.out.println("잘못된 ID 형식");
+			new AlertDialog("잘못된 ID 형식");
 		}
 	}
 	
@@ -251,16 +251,16 @@ public class LoginFrame extends JFrame {
 			if(validId == true) {
 				int res = userDao.insertUser(new UserVO(Id, pw, name, phone, email));
 				if(res == 1) {
-					System.out.println("유저 등록 성공");
+					new AlertDialog("유저 등록 성공");
 					return true;
 				}else {
-					System.out.println("유저 등록 실패");
+					new AlertDialog("유저 등록 실패");
 				}
 			} else {
-				System.out.println("아이디 중복 체크 필요");
+				new AlertDialog("아이디 중복 체크 필요");
 			}
 		}else {
-			System.out.println("모든 필드 입력 필요");
+			new AlertDialog("모든 필드 입력 필요");
 		}
 		return false;
 	} // end signup
@@ -277,12 +277,10 @@ public class LoginFrame extends JFrame {
 		UserVO vo = null;
 		
 		if(userId.length() * pw.length() > 0) {
-			System.out.println("asdfasdf");
 			vo = userDao.selectWithPw(userId, pw);
-			System.out.println("asdf");
 			return vo;
 		}else {
-			System.out.println("아이디와 비밀번호를 입력해주세요.");
+			new AlertDialog("아이디와 비밀번호를 입력해주세요.");
 		}
 		
 		return null;

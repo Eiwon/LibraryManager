@@ -62,7 +62,7 @@ public interface OracleBookQuery {
 	// 입력 book_id의 도서의 모든 값을 변경(name, writer, category, publisher, pub_date, state, image, book_id)
 	public static final String SQL_UPDATE = "UPDATE " + TABLE_BOOK + " SET " + 
 				NAME + " = ?, " + WRITER + " = ?, " + CATEGORY + " = ?, " + PUBLISHER + 
-				" = ?, " + PUB_DATE + " = TO_DATE(?, 'YYYY-MM-DD HH24-MI-SS'), " + STATE + " = ?, " + IMAGE + " = ? WHERE "
+				" = ?, " + PUB_DATE + " = ?, " + STATE + " = ?, " + IMAGE + " = ? WHERE "
 			+ BOOK_ID + " = ?";
 
 	// 입력 book_id의 도서 삭제(book_id)
@@ -76,7 +76,7 @@ public interface OracleBookQuery {
 	
 	// check_out 테이블에 데이터 추가 쿼리(book_id, user_id, state, check_out_date, check_in_date)
 	public static final String SQL_INSERT_CHECK_OUT = 
-			"INSERT INTO " + TABLE_CHECK_OUT + " VALUES( ?, ?, ?, TO_DATE(?, 'YYYY-MM-DD HH24-MI-SS'), TO_DATE(?, 'YYYY-MM-DD HH24-MI-SS'))";
+			"INSERT INTO " + TABLE_CHECK_OUT + " VALUES( ?, ?, ?, ?, ?)";
 	
 	// check_out 테이블로부터, 특정 book을 대출 또는 예약한 유저의 user_id 확인
 	public static final String SQL_SELECT_USER_BY_BOOK_STATE = 

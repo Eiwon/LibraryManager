@@ -1,4 +1,4 @@
-package lib.model;
+package lib.module.board;
 
 import java.time.LocalDateTime;
 

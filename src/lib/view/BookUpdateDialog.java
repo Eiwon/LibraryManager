@@ -6,6 +6,7 @@ import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -18,14 +19,20 @@ import javax.swing.JFileChooser;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.text.MaskFormatter;
 
 import lib.Interface.BookDAO;
+import lib.Interface.OracleBookQuery;
 import lib.controller.BookDAOImple;
 import lib.controller.ImageManager;
 import lib.model.BookVO;
+import lib.module.board.OracleBoardQuery;
 
 import javax.swing.JLabel;
 import javax.swing.JTextField;
+import javax.swing.JComboBox;
+import javax.swing.JFormattedTextField;
+import javax.swing.SwingConstants;
 
 public class BookUpdateDialog extends JDialog {
 
@@ -39,12 +46,12 @@ public class BookUpdateDialog extends JDialog {
 	private JButton btnExit;
 	private BookDAO dao;
 	private JLabel lblState;
-	private JTextField txtState;
 	private BookVO updateTarget;
 	private JButton btnAddImg;
 	private JLabel lblImg;
 	private ImageManager im;
 	private File selectedFile = null;
+	private JComboBox cbxState;
 	
 	public BookUpdateDialog() {
 		System.out.println("insert mode");
@@ -73,8 +80,8 @@ public class BookUpdateDialog extends JDialog {
 		txtWriter.setText(updateTarget.getWriter());
 		txtCategory.setText(updateTarget.getCategory());
 		txtPublisher.setText(updateTarget.getPublisher());
-		txtPubDate.setText(updateTarget.getPubDate().toString());
-		txtState.setText(updateTarget.getState());
+		txtPubDate.setText(updateTarget.getPubDate().toLocalDate().toString());
+		cbxState.setSelectedItem(updateTarget.getState());
 		
 		btnSubmit.setText("수정");
 		btnSubmit.addActionListener(new ActionListener() {
@@ -171,11 +178,6 @@ public class BookUpdateDialog extends JDialog {
 			lblState.setBounds(38, 462, 161, 40);
 			contentPanel.add(lblState);
 			
-			txtState = new JTextField();
-			txtState.setBounds(211, 462, 340, 54);
-			contentPanel.add(txtState);
-			txtState.setColumns(10);
-			
 			btnAddImg = new JButton("사진 등록");
 			btnAddImg.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
@@ -187,12 +189,22 @@ public class BookUpdateDialog extends JDialog {
 					}
 				}
 			});
-			btnAddImg.setBounds(12, 614, 97, 23);
+			btnAddImg.setBounds(469, 472, 97, 48);
 			contentPanel.add(btnAddImg);
 			
 			lblImg = new JLabel();
-			lblImg.setBounds(12, 512, 97, 95);
+			lblImg.setBounds(330, 436, 97, 95);
 			contentPanel.add(lblImg);
+			
+			cbxState = new JComboBox();
+			cbxState.addItem(OracleBookQuery.BOOK_STATE_SET);
+			cbxState.addItem(OracleBookQuery.BOOK_STATE_OUT);
+			cbxState.addItem(OracleBookQuery.BOOK_STATE_RSV);
+			cbxState.addItem(OracleBookQuery.BOOK_STATE_RSVSET);
+			cbxState.addItem(OracleBookQuery.BOOK_STATE_LOST);
+			cbxState.setBounds(135, 462, 114, 40);
+			contentPanel.add(cbxState);
+			
 			btnExit.addActionListener(new ActionListener() {
 				
 				@Override
@@ -209,22 +221,19 @@ public class BookUpdateDialog extends JDialog {
 		String writer = txtWriter.getText();
 		String category = txtCategory.getText();
 		String publisher = txtPublisher.getText();
-		System.out.println(txtPubDate.getText());
 		
-		
-		LocalDate date = LocalDate.parse(txtPubDate.getText(), DateTimeFormatter.ofPattern("yyyyMMdd"));
-		
-		LocalDateTime pubDate = LocalDateTime.of(date, LocalTime.of(0, 0, 0));
-		String state = txtState.getText();
+		String state = cbxState.getSelectedItem().toString();
 		String img = null;
 		
-		if(name.length() * writer.length() * category.length() * publisher.length() * pubDate.getYear() * state.length() == 0) {
-			System.out.println("모든 필드 입력 필요");
+		if(name.length() * writer.length() * category.length() * publisher.length() * txtPubDate.getText().length() * state.length() == 0) {
+			new AlertDialog("모든 필드 입력 필요");
 			return null;
 		}
 		if(selectedFile != null) {
 			img = selectedFile.getName();
 		}
+		LocalDate date = LocalDate.parse(txtPubDate.getText(), DateTimeFormatter.ofPattern("yyyyMMdd"));
+		LocalDateTime pubDate = LocalDateTime.of(date, LocalTime.of(0, 0, 0));
 		
 		return new BookVO(0, name, writer, category, publisher, pubDate, state, img);
 	} // end validCheck

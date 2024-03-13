@@ -1,4 +1,4 @@
-package lib.view;
+package lib.module.board;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
@@ -11,9 +11,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 
 import lib.Interface.OracleUserQuery;
-import lib.controller.BoardDAOImple;
-import lib.controller.UserManagementService;
-import lib.model.PostVO;
+import lib.controller.UserManager;
 
 import javax.swing.JList;
 import javax.swing.JTable;
@@ -164,7 +162,7 @@ public class BoardDialog extends JDialog {
 		
 		
 		readBtnSet = new JPanel();
-		readBtnSet.setBounds(507, 521, 367, 42);
+		readBtnSet.setBounds(507, 521, 367, 45);
 		panelRead.add(readBtnSet);
 		readBtnSet.setLayout(null);
 		
@@ -347,16 +345,17 @@ public class BoardDialog extends JDialog {
 	} // setMode
 	
 	private void insertPost() {
-		PostVO vo = new PostVO(0, txtTitle.getText(), txtContent.getText(), UserManagementService.getUserId(), 
+		System.out.println("BoardDialog : insertPost()");
+		PostVO vo = new PostVO(0, txtTitle.getText(), txtContent.getText(), UserManager.getUserId(), 
 				cbxWrite.getSelectedItem().toString(), 0, null);
 		if(dao.insertPost(vo) == 1) {
-			System.out.println("boardDialog : 글 등록 성공");
 			txtTitle.setText("");
 			txtContent.setText("");
 		}
-	}
+	} // end insertPost
 	
 	private void readPost() {
+		System.out.println("BoardDialog : readPost()");
 		int selectedPostId = printedList.get(table.getSelectedRow()).getId();
 		setMode(READMODE);
 		replyComp.setPostId(selectedPostId);
@@ -365,8 +364,8 @@ public class BoardDialog extends JDialog {
 		cbxRead.setSelectedItem(selectedPost.getTag());
 		txtReadTitle.setText(selectedPost.getTitle());
 		txtReadContent.setText(selectedPost.getContent());
-		if(!UserManagementService.getUserAuth().equals(OracleUserQuery.AUTH_ADMIN)
-				|| !UserManagementService.getUserId().equals(selectedPost.getUserId())) {
+		if(!UserManager.getUserAuth().equals(OracleUserQuery.AUTH_ADMIN)
+				&& !UserManager.getUserId().equals(selectedPost.getUserId())) {
 			// 관리자 또는 글의 작성자가 아닐 경우, 수정 삭제 불가
 			cbxRead.setEditable(false);
 			txtReadTitle.setEditable(false);
@@ -374,19 +373,22 @@ public class BoardDialog extends JDialog {
 			btnUpdate.setVisible(false);
 			btnDelete.setVisible(false);
 		}
-	}
+	} // end readPost
 	
 	private void updatePost() {
+		System.out.println("BoardDialog : updatePost()");
 		PostVO vo = new PostVO(selectedPost.getId(), txtReadTitle.getText(), txtReadContent.getText(), "", 
 				cbxRead.getSelectedItem().toString(), 0, null);
 		dao.updatePost(vo);
-	}
+	} // end updatePost
 	
 	private void deletePost() {
+		System.out.println("BoardDialog : deletePost()");
 		dao.deletePost(selectedPost.getId());
-	}
+	} // end deletePost
 	
 	private void search() { // 현재 설정된 검색 타입과 페이지에 따라 검색 후 테이블에 출력
+		System.out.println("BoardDialog : search()");
 		if(searchType == SEARCHTITLE) {
 			printedList = dao.selectPostByTitle(curTarget, currentPage);
 		}else if(searchType == SEARCHWRITER) {
@@ -400,6 +402,7 @@ public class BoardDialog extends JDialog {
 	} // end search
 	
 	private void searchInit() {
+		System.out.println("BoardDialog : searchInit()");
 		currentPage = 1;
 		searchType = cbxTarget.getSelectedIndex();
 		curTarget = txtTarget.getText();

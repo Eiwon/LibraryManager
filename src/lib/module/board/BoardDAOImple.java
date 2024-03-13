@@ -1,4 +1,4 @@
-package lib.controller;
+package lib.module.board;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -8,11 +8,7 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 
-import lib.Interface.BoardDAO;
-import lib.Interface.OracleBoardQuery;
 import lib.model.BookVO;
-import lib.model.PostVO;
-import lib.model.ReplyVO;
 import oracle.jdbc.OracleDriver;
 
 public class BoardDAOImple implements BoardDAO, OracleBoardQuery{

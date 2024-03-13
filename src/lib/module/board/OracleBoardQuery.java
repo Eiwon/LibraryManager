@@ -1,4 +1,4 @@
-package lib.Interface;
+package lib.module.board;
 
 public interface OracleBoardQuery {
 	

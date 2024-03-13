@@ -6,17 +6,17 @@ import java.time.LocalDateTime;
 import lib.Interface.UserDAO;
 import lib.model.UserVO;
 
-public class UserManagementService {
+public class UserManager {
 
-	private static UserManagementService instance = null;
+	private static UserManager instance = null;
 	private static UserVO currentUser = new UserVO("Guest", "guest", "guest", "0", "guest");
 	
 	
-	private UserManagementService() {}
+	private UserManager() {}
 	
-	public UserManagementService getInstance() {
+	public UserManager getInstance() {
 		if(instance == null) {
-			instance = new UserManagementService();
+			instance = new UserManager();
 		}
 		return instance;
 	}
@@ -38,7 +38,7 @@ public class UserManagementService {
 	}
 
 	public static void setCurrentUser(UserVO currentUser) {
-		UserManagementService.currentUser = currentUser;
+		UserManager.currentUser = currentUser;
 	}
 	
 	public static boolean isBan() {

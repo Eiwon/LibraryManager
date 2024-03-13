@@ -241,11 +241,13 @@ public class UserDAOImple implements UserDAO, OracleUserQuery{
 			pstmt.setString(1, userId);
 			pstmt.setString(2, OracleBookQuery.BOOK_STATE_OUT);
 			ResultSet rs = pstmt.executeQuery();
-			
-			if(rs.next()) {
-				res = rs.getTimestamp(1).toLocalDateTime();
+			// 검색된 열이 없으면 MIN() 결과값은 ResultSet {null} 반환
+			if(rs.next()) { 
+				if(rs.getTimestamp(1) != null) {
+					res = rs.getTimestamp(1).toLocalDateTime();
+				}
+				System.out.println("가장 빠른 반납일 검색 성공");
 			}
-			System.out.println("가장 빠른 반납일 검색 성공");
 			
 		} catch (SQLException e) {
 			e.printStackTrace();

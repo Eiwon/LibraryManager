@@ -83,6 +83,7 @@ public class BookManagerComp extends JComponent {
 			}
 		};
 		tabSearch = new JTable(tableModel);
+		
 		scrollPane.setViewportView(tabSearch);
 		
 		panelMove = new JPanel();
@@ -133,7 +134,7 @@ public class BookManagerComp extends JComponent {
 			books[2] = vo.getWriter();
 			books[3] = vo.getCategory();
 			books[4] = vo.getPublisher();
-			books[5] = vo.getPubDate().toString().substring(0, 10);
+			books[5] = vo.getPubDate().toLocalDate().toString();
 			books[6] = vo.getState();
 			
 			tableModel.addRow(books);

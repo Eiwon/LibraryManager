@@ -1,4 +1,4 @@
-package lib.view;
+package lib.module.board;
 
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
@@ -12,9 +12,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 
 import lib.Interface.OracleUserQuery;
-import lib.controller.BoardDAOImple;
-import lib.controller.UserManagementService;
-import lib.model.ReplyVO;
+import lib.controller.UserManager;
 
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
@@ -149,7 +147,7 @@ public class ReplyComp extends JComponent {
 	}
 	
 	private void insertReply(String content) {
-		ReplyVO vo = new ReplyVO(0, postId, UserManagementService.getUserId(), content,
+		ReplyVO vo = new ReplyVO(0, postId, UserManager.getUserId(), content,
 				LocalDateTime.now());
 		dao.insertReply(vo);
 	} // end insertReply
@@ -186,8 +184,8 @@ public class ReplyComp extends JComponent {
 	}
 	
 	public boolean hasAuth(int selectedRow) {
-		if(UserManagementService.getUserAuth().equals(OracleUserQuery.AUTH_ADMIN) 
-				|| printedList.get(selectedRow).getUserId().equals(UserManagementService.getUserId())) {
+		if(UserManager.getUserAuth().equals(OracleUserQuery.AUTH_ADMIN) 
+				|| printedList.get(selectedRow).getUserId().equals(UserManager.getUserId())) {
 			return true; // 현재 계정 권한이 관리자 권한이거나 userId가 선택된 댓글 작성자 userId와 같을 경우
 		}else return false;
 	}

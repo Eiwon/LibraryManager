@@ -16,7 +16,7 @@ public class UserVO {
 		this.name = name;
 		this.phone = phone;
 		this.email = email;
-		this.auth = "ADMIN";
+		this.auth = "GUEST";
 	}
 	
 	public String getUserId() {

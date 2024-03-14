@@ -52,7 +52,12 @@ public interface OracleBoardQuery {
 	// 게시글 ID 지정 검색
 	public static final String SQL_SELECT_POST_BY_ID = "SELECT * FROM " + TABLE_POST + " WHERE " + POST_ID
 			+ " = ?";
-
+	
+	// 지정 게시글 ID의 조회수 +1
+	public static final String SQL_VIEW_INCREASE = "UPDATE " + TABLE_POST + " SET " + VIEWS + 
+			" = (SELECT " + VIEWS + " FROM " + TABLE_POST + " WHERE " + POST_ID + " = ?) + 1 WHERE "
+			+ POST_ID + " = ?";
+	
 	// 게시글 USER ID 지정 검색
 	public static final String SQL_SELECT_POST_BY_UID = "SELECT * FROM ( SELECT " + TABLE_POST
 			+ ".*, ROW_NUMBER() OVER (ORDER BY " + WRITE_DATE + " DESC) AS RN FROM " + TABLE_POST

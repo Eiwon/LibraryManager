@@ -1,27 +1,17 @@
 package lib.view;
 
-import java.awt.EventQueue;
-import java.awt.Window;
-
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JButton;
-import javax.swing.JDialog;
 
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
-import javax.swing.JTextField;
+import java.awt.Dialog;
 
 import lib.Interface.OracleUserQuery;
-import lib.Interface.UISize;
-import lib.Interface.UserDAO;
 import lib.controller.BookDAOImple;
-import lib.controller.UserDAOImple;
 import lib.controller.UserManager;
 import lib.model.BookVO;
 import lib.module.board.BoardDialog;
@@ -29,7 +19,7 @@ import lib.module.room.ReadingRoom;
 
 import javax.swing.JPanel;
 
-public class Library implements UISize{
+public class Library{
 	private JFrame frame;
 	private JButton btnLogin;
 	private JButton btnLogout;
@@ -37,18 +27,19 @@ public class Library implements UISize{
 	private JButton btnUpdate;
 	private JButton btnDelete;
 	private JPanel panelForAdmin;
-	private BookUpdateDialog budInsert;
 	private JPanel panelForMember;
 	private JButton btnBorrow;
 	private JButton btnMyInfo;
 	private JButton btnReadingRoom;
+	private Dialog libDialog;
+	
 	public Library() {
 		initialize();
 	}
 
 	private void initialize() {
 		frame = new JFrame();
-		frame.setBounds(mainFrameX, mainFrameY, mainFrameW, mainFrameH);
+		frame.setBounds(300, 100, 1300, 850);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setVisible(true);
 		frame.getContentPane().setLayout(null);
@@ -107,6 +98,9 @@ public class Library implements UISize{
 		btnLogout.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				UserManager.initUser();
+				if(libDialog != null) {
+					libDialog.dispose();	
+				}
 				btnRefresh();
 			}
 		});
@@ -123,7 +117,10 @@ public class Library implements UISize{
 		panelForAdmin.add(btnInsert);
 		btnInsert.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				budInsert = new BookUpdateDialog();
+				if(libDialog != null) {
+					libDialog.dispose();	
+				}
+				libDialog = new BookUpdateDialog();
 			}
 		});
 		
@@ -135,8 +132,12 @@ public class Library implements UISize{
 		btnUpdate.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				BookVO vo = bookManager.getSelectedBook();
-				if(vo != null)
-					budInsert = new BookUpdateDialog(vo);
+				if(vo != null) {
+					if(libDialog != null) {
+						libDialog.dispose();	
+					}
+					libDialog = new BookUpdateDialog(vo);
+				}
 			}
 		});
 		
@@ -147,7 +148,9 @@ public class Library implements UISize{
 		panelForAdmin.add(btnDelete);
 		btnDelete.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				BookDAOImple.getInstance().deleteBook(bookManager.getSelectedBook().getBookId());
+				if(BookDAOImple.getInstance().deleteBook(bookManager.getSelectedBook().getBookId()) == 1) {
+					new AlertDialog("삭제에 성공했습니다.");
+				}
 			}
 		});
 		
@@ -164,7 +167,10 @@ public class Library implements UISize{
 			public void actionPerformed(ActionEvent e) {
 				BookVO vo = bookManager.getSelectedBook();
 				if(vo != null) {
-					new CheckoutDialog(vo);
+					if(libDialog != null) {
+						libDialog.dispose();	
+					}
+					libDialog = new CheckoutDialog(vo);
 				}
 			}
 		});
@@ -176,7 +182,10 @@ public class Library implements UISize{
 		btnMyInfo.setBounds(12, 66, 119, 46);
 		btnMyInfo.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				new MyInfoDialog();
+				if(libDialog != null) {
+					libDialog.dispose();	
+				}
+				libDialog = new MyInfoDialog();
 			}
 		});
 		
@@ -185,7 +194,10 @@ public class Library implements UISize{
 		JButton btnBoard = new JButton();
 		btnBoard.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				new BoardDialog();
+				if(libDialog != null) {
+					libDialog.dispose();	
+				}
+				libDialog =  new BoardDialog();
 			}
 		});
 		btnBoard.setText("문의하기");
@@ -195,7 +207,10 @@ public class Library implements UISize{
 		btnReadingRoom = new JButton();
 		btnReadingRoom.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				new ReadingRoom();
+				if(libDialog != null) {
+					libDialog.dispose();	
+				}
+				libDialog = new ReadingRoom(UserManager.getUserId(), UserManager.getUserAuth());
 			}
 		});
 		btnReadingRoom.setText("열람실");

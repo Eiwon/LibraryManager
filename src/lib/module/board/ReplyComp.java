@@ -1,18 +1,15 @@
 package lib.module.board;
 
-import java.awt.BorderLayout;
-import java.awt.EventQueue;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 import javax.swing.JComponent;
-import javax.swing.JFrame;
 import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 
 import lib.Interface.OracleUserQuery;
 import lib.controller.UserManager;
+import lib.view.AlertDialog;
 
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
@@ -22,41 +19,46 @@ import javax.swing.JButton;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.sql.Timestamp;
 import java.awt.event.ActionEvent;
 
 public class ReplyComp extends JComponent {
 
-	private JPanel contentPane;
+	private static final long serialVersionUID = 1L;
 	private JTable table;
 	private JPanel panelSbtnSet;
 	private JTextArea txtReply;
+	private BoardDAOImple dao;
+
 	private DefaultTableModel tableModel;
 	private String[] tableCol = {"ID", "내용", "작성일자"};
 	private Object[] rowObj = new Object[3];
 	private int currentPage = 1;
 	private int postId;
 	private ArrayList<ReplyVO> printedList;
-	private BoardDAOImple dao;
 	
 	public ReplyComp() {
-		setBounds(100, 100, 849, 200);
 		dao = BoardDAOImple.getInstance();
 		JLabel lblReply = new JLabel("댓글");
 		lblReply.setBounds(12, 10, 150, 30);
 		add(lblReply);
 		
 		JScrollPane scrollPane = new JScrollPane();
-		scrollPane.setBounds(10, 34, 828, 125);
+		scrollPane.setBounds(10, 34, 828, 175);
 		add(scrollPane);
 		
 		tableModel = new DefaultTableModel(tableCol, 0) {
+			private static final long serialVersionUID = 2L;
+
 			@Override
 			public boolean isCellEditable(int row, int column) {
 				return false;
 			}
 		};
 		table = new JTable(tableModel);
+		table.setRowHeight(30);
+		table.getColumnModel().getColumn(0).setPreferredWidth(15);
+		table.getColumnModel().getColumn(1).setPreferredWidth(250);
+		table.getColumnModel().getColumn(2).setPreferredWidth(20);
 		table.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -74,11 +76,11 @@ public class ReplyComp extends JComponent {
 		scrollPane.setViewportView(table);
 		
 		txtReply = new JTextArea();
-		txtReply.setBounds(12, 157, 495, 40);
+		txtReply.setBounds(12, 210, 495, 30);
 		add(txtReply);
 		
 		JPanel panelBtnSet = new JPanel();
-		panelBtnSet.setBounds(634, 154, 204, 43);
+		panelBtnSet.setBounds(634, 200, 204, 43);
 		add(panelBtnSet);
 		panelBtnSet.setLayout(null);
 		
@@ -144,7 +146,7 @@ public class ReplyComp extends JComponent {
 		});
 		btnDelete.setBounds(61, 0, 62, 36);
 		panelSbtnSet.add(btnDelete);
-	}
+	} // end ReplyComp
 	
 	private void insertReply(String content) {
 		ReplyVO vo = new ReplyVO(0, postId, UserManager.getUserId(), content,
@@ -157,14 +159,20 @@ public class ReplyComp extends JComponent {
 		int replyId = printedList.get(selectedRow).getId();
 		String content = txtReply.getText();
 		ReplyVO vo = new ReplyVO(replyId, 0, "", content, null);
-		dao.updateReply(vo);
+		int res = dao.updateReply(vo);
+		if(res == 1) {
+			new AlertDialog("수정 성공");
+		}
 	} // end updateReply
 	
 	private void deleteReply() {
 		int selectedRow = table.getSelectedRow();
 		if(selectedRow >= 0) {
 			int replyId = printedList.get(selectedRow).getId();
-			dao.deleteReply(replyId);
+			int res = dao.deleteReply(replyId);
+			if(res == 1) {
+				new AlertDialog("삭제 성공");
+			}
 		}
 	} // end deleteReply
 	

@@ -1,6 +1,5 @@
 package lib.view;
 
-import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 
 import javax.swing.JButton;
@@ -11,7 +10,6 @@ import javax.swing.border.EmptyBorder;
 import lib.Interface.OracleBookQuery;
 import lib.controller.BookDAOImple;
 import lib.controller.ImageManager;
-import lib.controller.UserDAOImple;
 import lib.controller.UserManager;
 import lib.model.BookVO;
 
@@ -19,11 +17,10 @@ import javax.swing.JTextPane;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import javax.swing.JLabel;
 
 public class CheckoutDialog extends JDialog {
-
+	private static final long serialVersionUID = 1L;
 	private static final int MAX_CHECK_OUT_TIME = 7;
 	private final JPanel contentPanel = new JPanel();
 	private JTextPane txtBookInfo;
@@ -122,6 +119,7 @@ public class CheckoutDialog extends JDialog {
 		}
 		
 	} // end CheckoutDialog
+	
 	private void printBookInfo(BookVO vo) {
 		String contents = "";
 		contents = contents.concat("제목 : " + vo.getName() + "\n");

@@ -7,7 +7,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 
 import lib.Interface.OracleBookQuery;
 import lib.Interface.OracleUserQuery;
@@ -38,7 +37,7 @@ public class UserDAOImple implements UserDAO, OracleUserQuery{
 		try {
 			DriverManager.registerDriver(new OracleDriver());
 			conn = DriverManager.getConnection(URL, USER, PASSWORD);
-			pstmt = conn.prepareStatement(SQL_INSERT);
+			pstmt = conn.prepareStatement(SQL_INSERT_USER);
 			
 			pstmt.setString(1, vo.getUserId());
 			pstmt.setString(2, vo.getPw());
@@ -57,7 +56,6 @@ public class UserDAOImple implements UserDAO, OracleUserQuery{
 				conn.close();
 				pstmt.close();
 			} catch (SQLException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -92,7 +90,6 @@ public class UserDAOImple implements UserDAO, OracleUserQuery{
 				conn.close();
 				pstmt.close();
 			} catch (SQLException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -127,7 +124,6 @@ public class UserDAOImple implements UserDAO, OracleUserQuery{
 				conn.close();
 				pstmt.close();
 			} catch (SQLException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -159,7 +155,6 @@ public class UserDAOImple implements UserDAO, OracleUserQuery{
 				conn.close();
 				pstmt.close();
 			} catch (SQLException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -177,7 +172,6 @@ public class UserDAOImple implements UserDAO, OracleUserQuery{
 			pstmt = conn.prepareStatement(SQL_SELECT_BY_USERID_FROM_BLACK);
 			pstmt.setString(1, userId);
 			ResultSet rs = pstmt.executeQuery();
-			LocalDateTime temp;
 			if(rs.next()) {
 				res = new String[3];
 				res[0] = rs.getString(1);
@@ -193,7 +187,6 @@ public class UserDAOImple implements UserDAO, OracleUserQuery{
 				conn.close();
 				pstmt.close();
 			} catch (SQLException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}

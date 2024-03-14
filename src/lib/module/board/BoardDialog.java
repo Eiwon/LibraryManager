@@ -1,7 +1,5 @@
 package lib.module.board;
 
-import java.awt.BorderLayout;
-import java.awt.FlowLayout;
 import java.util.ArrayList;
 
 import javax.swing.JButton;
@@ -12,20 +10,19 @@ import javax.swing.table.DefaultTableModel;
 
 import lib.Interface.OracleUserQuery;
 import lib.controller.UserManager;
+import lib.view.AlertDialog;
 
-import javax.swing.JList;
 import javax.swing.JTable;
 import javax.swing.JScrollPane;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.time.LocalDateTime;
 import java.awt.event.ActionEvent;
 import javax.swing.JTextField;
 import javax.swing.JComboBox;
 
 public class BoardDialog extends JDialog {
+	private static final long serialVersionUID = 1L;
 	private static final int LISTMODE = 1;
 	private static final int WRITEMODE = 2;
 	private static final int READMODE = 3;
@@ -38,37 +35,35 @@ public class BoardDialog extends JDialog {
 	private JPanel panelList;
 	private JPanel panelWrite;
 	private JPanel panelRead;
-	private ReplyComp replyComp;
-	
+	private JPanel writeBtnSet;
+	private JPanel readBtnSet;
+	private JPanel panelSearch;
+	private JTextField txtTitle;
+	private JTextField txtReadTitle;
+	private JTextField txtReadContent;
+	private JTextField txtTarget;
+	private JTextField txtContent;
+	private JButton btnBack;
+	private JButton btnDelete;
+	private JButton btnUpdate;
+	private JButton btnSearch;
 	private JTable table;
 	private DefaultTableModel tableModel;
+	private JComboBox<String> cbxTarget;
+	private JComboBox<String> cbxRead;
+	private JComboBox<String> cbxWrite;
+
+	private ReplyComp replyComp;
+	
+	private BoardDAOImple dao;
 	private String[] tableCol = {"글 번호", "분류", "제목", "작성자", "작성일", "조회수"};
 	private Object[] post = new Object[tableCol.length];
 	private int currentPage = 1;
 	private int searchType = SEARCHALL;
 	private String curTarget = "";
-	
-	private JTextField txtTitle;
-	private JTextField txtContent;
-	private BoardDAOImple dao;
-	private JComboBox cbxWrite;
-	private JPanel writeBtnSet;
-	
 	private ArrayList<PostVO> printedList;
 	private PostVO selectedPost;
-	private JTextField txtReadTitle;
-	private JTextField txtReadContent;
-	private JComboBox cbxRead;
-	private JPanel readBtnSet;
-	private JButton btnBack;
-	private JButton btnDelete;
-	private JButton btnUpdate;
-	private JPanel panelSearch;
-	private JComboBox cbxTarget;
-	private JTextField txtTarget;
-	private JButton btnSearch;
-	private JTextField textField;
-	
+		
 	public BoardDialog() {
 		dao = BoardDAOImple.getInstance();
 		printedList = dao.selectPage(currentPage);
@@ -127,14 +122,14 @@ public class BoardDialog extends JDialog {
 		btnCancel.setBounds(175, 14, 120, 27);
 		writeBtnSet.add(btnCancel);
 		
-		cbxWrite = new JComboBox();
+		cbxWrite = new JComboBox<>();
 		cbxWrite.addItem("도서 문의");
 		cbxWrite.addItem("시설 문의");
 		cbxWrite.addItem("공지 사항");
 		cbxWrite.addItem("기타");
 		cbxWrite.setBounds(44, 32, 100, 43);
 		panelWrite.add(cbxWrite);
-	}
+	} // end setWritePanel
 	
 	private void setReadPanel() {
 		panelRead = new JPanel();
@@ -152,7 +147,7 @@ public class BoardDialog extends JDialog {
 		panelRead.add(txtReadContent);
 		txtReadContent.setColumns(10);
 		
-		cbxRead = new JComboBox();
+		cbxRead = new JComboBox<>();
 		cbxRead.addItem("도서 문의");
 		cbxRead.addItem("시설 문의");
 		cbxRead.addItem("공지 사항");
@@ -199,9 +194,9 @@ public class BoardDialog extends JDialog {
 		readBtnSet.add(btnUpdate);
 		
 		replyComp = new ReplyComp();
-		replyComp.setBounds(20, 270, 850, 250);
+		replyComp.setBounds(20, 270, 850, 280);
 		panelRead.add(replyComp);
-	}
+	} // setReadPanel
 	
 	private void setListPanel() {
 		panelList = new JPanel();
@@ -224,12 +219,22 @@ public class BoardDialog extends JDialog {
 		panelList.add(scrollPane);
 		
 		tableModel = new DefaultTableModel(tableCol, 0) {
+			private static final long serialVersionUID = 2L;
+
 			@Override
 			public boolean isCellEditable(int row, int column) {
 				return false;
 			}
 		};
 		table = new JTable(tableModel);
+		table.setRowHeight(30);
+		table.getColumnModel().getColumn(0).setPreferredWidth(10);
+		table.getColumnModel().getColumn(1).setPreferredWidth(20);
+		table.getColumnModel().getColumn(2).setPreferredWidth(200);
+		table.getColumnModel().getColumn(3).setPreferredWidth(20);
+		table.getColumnModel().getColumn(4).setPreferredWidth(15);
+		table.getColumnModel().getColumn(5).setPreferredWidth(10);
+		
 		table.setBounds(12, 10, 912, 484);
 		table.addMouseListener(new MouseAdapter() {
 			@Override
@@ -244,7 +249,7 @@ public class BoardDialog extends JDialog {
 		panelList.add(panelSearch);
 		panelSearch.setLayout(null);
 		
-		cbxTarget = new JComboBox();
+		cbxTarget = new JComboBox<>();
 		cbxTarget.setBounds(12, 10, 85, 41);
 		cbxTarget.addItem("제목");
 		cbxTarget.addItem("분류");
@@ -305,7 +310,7 @@ public class BoardDialog extends JDialog {
 		
 		printTable();
 		
-	}
+	} // end setListPanel
 	//"글 번호", "분류", "제목", "작성자", "작성일", "조회수"
 	private void printTable() {
 		tableModel.setRowCount(0);
@@ -357,6 +362,7 @@ public class BoardDialog extends JDialog {
 	private void readPost() {
 		System.out.println("BoardDialog : readPost()");
 		int selectedPostId = printedList.get(table.getSelectedRow()).getId();
+		dao.updateViewsUp(selectedPostId); // 조회수 +1
 		setMode(READMODE);
 		replyComp.setPostId(selectedPostId);
 		replyComp.printReply();
@@ -379,12 +385,18 @@ public class BoardDialog extends JDialog {
 		System.out.println("BoardDialog : updatePost()");
 		PostVO vo = new PostVO(selectedPost.getId(), txtReadTitle.getText(), txtReadContent.getText(), "", 
 				cbxRead.getSelectedItem().toString(), 0, null);
-		dao.updatePost(vo);
+		int res = dao.updatePost(vo);
+		if(res == 1) {
+			new AlertDialog("수정 성공");
+		}
 	} // end updatePost
 	
 	private void deletePost() {
 		System.out.println("BoardDialog : deletePost()");
-		dao.deletePost(selectedPost.getId());
+		int res = dao.deletePost(selectedPost.getId());
+		if(res == 1) {
+			new AlertDialog("삭제 성공");
+		}
 	} // end deletePost
 	
 	private void search() { // 현재 설정된 검색 타입과 페이지에 따라 검색 후 테이블에 출력

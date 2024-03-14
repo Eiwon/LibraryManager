@@ -8,7 +8,6 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 
-import lib.model.BookVO;
 import oracle.jdbc.OracleDriver;
 
 public class BoardDAOImple implements BoardDAO, OracleBoardQuery{
@@ -288,8 +287,8 @@ public class BoardDAOImple implements BoardDAO, OracleBoardQuery{
 			conn = DriverManager.getConnection(URL, USER, PASSWORD);
 			pstmt = conn.prepareStatement(SQL_SELECT_REPLY_BY_PID);
 			pstmt.setInt(1, postId);
-			pstmt.setInt(2, (page -1) *10 +1);
-			pstmt.setInt(3, page *10);
+			pstmt.setInt(2, (page -1) *5 +1);
+			pstmt.setInt(3, page *5);
 			
 			ResultSet rs = pstmt.executeQuery();
 			
@@ -399,5 +398,33 @@ public class BoardDAOImple implements BoardDAO, OracleBoardQuery{
 		
 		return res;
 	} // deleteReply
+
+	@Override
+	public int updateViewsUp(int postId) {
+		System.out.println("boardDaoImple : updateViewsUp()");
+		int res = 0;
+		try {
+			DriverManager.registerDriver(new OracleDriver());
+			conn = DriverManager.getConnection(URL, USER, PASSWORD);
+			pstmt = conn.prepareStatement(SQL_VIEW_INCREASE);
+			
+			pstmt.setInt(1, postId);
+			pstmt.setInt(2, postId);
+			
+			res = pstmt.executeUpdate();
+			if(res == 1)
+				System.out.println(res + " 글 조회수 +1");
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}finally {
+			try {
+				conn.close();
+				pstmt.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		return res;
+	} // end updateViewsUp
 	
 }

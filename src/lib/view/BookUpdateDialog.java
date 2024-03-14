@@ -1,57 +1,59 @@
 package lib.view;
 
-import java.awt.BorderLayout;
-import java.awt.FlowLayout;
-import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.text.ParseException;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
-
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
-import javax.swing.filechooser.FileNameExtensionFilter;
-import javax.swing.text.MaskFormatter;
 
 import lib.Interface.BookDAO;
 import lib.Interface.OracleBookQuery;
 import lib.controller.BookDAOImple;
 import lib.controller.ImageManager;
 import lib.model.BookVO;
-import lib.module.board.OracleBoardQuery;
 
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 import javax.swing.JComboBox;
-import javax.swing.JFormattedTextField;
 import javax.swing.SwingConstants;
 
 public class BookUpdateDialog extends JDialog {
-
-	private final JPanel contentPanel = new JPanel();
+	
+	private static final long serialVersionUID = 1L;
+	//private final JPanel contentPanel = new JPanel();
+	private JPanel panelName;
+	private JPanel panelWriter;
+	private JPanel panelCategory;
+	private JPanel panelPublisher;
+	private JPanel panelPubDate;
+	private JPanel panelImg;
+	private JLabel lblState;
+	private JLabel lblImg;
 	private JTextField txtName;
 	private JTextField txtWriter;
 	private JTextField txtCategory;
 	private JTextField txtPublisher;
-	private JTextField txtPubDate;
+	private JTextField txtYear;
+	private JTextField txtMonth;
+	private JTextField txtDay;
 	private JButton btnSubmit;
 	private JButton btnExit;
-	private BookDAO dao;
-	private JLabel lblState;
-	private BookVO updateTarget;
 	private JButton btnAddImg;
-	private JLabel lblImg;
+	private BookDAO dao;
+	private BookVO updateTarget;
 	private ImageManager im;
 	private File selectedFile = null;
-	private JComboBox cbxState;
+	private JComboBox<String> cbxState;
+	private String[] stateOpt = { 
+			OracleBookQuery.BOOK_STATE_SET, 
+			OracleBookQuery.BOOK_STATE_OUT,
+			OracleBookQuery.BOOK_STATE_RSV,
+			OracleBookQuery.BOOK_STATE_RSVSET,
+			OracleBookQuery.BOOK_STATE_LOST
+			};
 	
 	public BookUpdateDialog() {
 		System.out.println("insert mode");
@@ -69,7 +71,6 @@ public class BookUpdateDialog extends JDialog {
 				dispose();
 			}
 		});
-		
 	} // end constructor for insert
 
 	public BookUpdateDialog(BookVO vo) {
@@ -80,7 +81,10 @@ public class BookUpdateDialog extends JDialog {
 		txtWriter.setText(updateTarget.getWriter());
 		txtCategory.setText(updateTarget.getCategory());
 		txtPublisher.setText(updateTarget.getPublisher());
-		txtPubDate.setText(updateTarget.getPubDate().toLocalDate().toString());
+		LocalDateTime pubDate = vo.getPubDate();
+		txtYear.setText(String.valueOf(pubDate.getYear()));
+		txtMonth.setText(String.valueOf(pubDate.getMonthValue()));
+		txtDay.setText(String.valueOf(pubDate.getDayOfMonth()));
 		cbxState.setSelectedItem(updateTarget.getState());
 		
 		btnSubmit.setText("수정");
@@ -89,15 +93,14 @@ public class BookUpdateDialog extends JDialog {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				BookVO vo = validCheck();
-				vo.setBookId(updateTarget.getBookId());
-				if(vo != null)
+				if(vo != null) {
+					vo.setBookId(updateTarget.getBookId());
 					dao.updateBook(vo);
+				}
 				dispose();
 			}
 
 		});
-		
-		
 	} // end constructor for update
 
 	public void init() {
@@ -110,110 +113,159 @@ public class BookUpdateDialog extends JDialog {
 		
 		setBounds(100, 100, 635, 719);
 		getContentPane().setLayout(null);
-		contentPanel.setBounds(0, 0, 619, 647);
-		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
-		getContentPane().add(contentPanel);
-		contentPanel.setLayout(null);
-		
-		JLabel lblName = new JLabel("제목");
-		lblName.setBounds(38, 82, 155, 34);
-		contentPanel.add(lblName);
-		
-		JLabel lblWriter = new JLabel("저자");
-		lblWriter.setBounds(38, 160, 155, 34);
-		contentPanel.add(lblWriter);
-		
-		JLabel lblCategory = new JLabel("장르");
-		lblCategory.setBounds(38, 237, 155, 34);
-		contentPanel.add(lblCategory);
-		
-		JLabel lblPublisher = new JLabel("출판사");
-		lblPublisher.setBounds(38, 316, 155, 34);
-		contentPanel.add(lblPublisher);
-		
-		JLabel lblPubDate = new JLabel("출판일");
-		lblPubDate.setBounds(38, 384, 155, 34);
-		contentPanel.add(lblPubDate);
 		
 		JLabel lblMode = new JLabel("도서 등록");
+		lblMode.setHorizontalAlignment(SwingConstants.CENTER);
 		lblMode.setBounds(150, 22, 277, 48);
-		contentPanel.add(lblMode);
+		getContentPane().add(lblMode);
+			
+		btnSubmit = new JButton("등록");
+		btnSubmit.setBounds(153, 519, 93, 66);
+		getContentPane().add(btnSubmit);
+			
+		btnExit = new JButton("돌아가기");
+		btnExit.setBounds(327, 519, 114, 66);
+		getContentPane().add(btnExit);
+			
+		lblState = new JLabel("상태");
+		lblState.setBounds(38, 404, 161, 40);
+		getContentPane().add(lblState);
+			
+		cbxState = new JComboBox<>(stateOpt);
+		cbxState.setBounds(135, 462, 114, 40);
+		getContentPane().add(cbxState);
+			
+		panelPubDate = new JPanel();
+		panelPubDate.setBounds(38, 320, 541, 54);
+		getContentPane().add(panelPubDate);
+		panelPubDate.setLayout(null);
+
+		JLabel lblYear = new JLabel("년");
+		lblYear.setBounds(308, 16, 27, 29);
+		panelPubDate.add(lblYear);
 		
+		JLabel lblMonth = new JLabel("월");
+		lblMonth.setBounds(404, 13, 34, 29);
+		panelPubDate.add(lblMonth);
+		
+		JLabel lblDay = new JLabel("일");
+		lblDay.setBounds(507, 13, 34, 34);
+		panelPubDate.add(lblDay);
+			
+		JLabel lblPubDate = new JLabel("출판일");
+		lblPubDate.setHorizontalAlignment(SwingConstants.CENTER);
+		lblPubDate.setBounds(20, 10, 65, 40);
+		panelPubDate.add(lblPubDate);
+			
+		txtYear = new JTextField();
+		txtYear.setHorizontalAlignment(SwingConstants.CENTER);
+		txtYear.setBounds(205, 17, 91, 27);
+		panelPubDate.add(txtYear);
+		txtYear.setColumns(10);
+			
+		txtMonth = new JTextField();
+		txtMonth.setHorizontalAlignment(SwingConstants.CENTER);
+		txtMonth.setBounds(347, 13, 45, 35);
+		panelPubDate.add(txtMonth);
+		txtMonth.setColumns(10);
+			
+		txtDay = new JTextField();
+		txtDay.setHorizontalAlignment(SwingConstants.CENTER);
+		txtDay.setBounds(450, 13, 45, 35);
+		panelPubDate.add(txtDay);
+		txtDay.setColumns(10);
+			
+			
+		panelImg = new JPanel();
+		panelImg.setBounds(341, 400, 238, 108);
+		getContentPane().add(panelImg);
+		panelImg.setLayout(null);
+			
+		lblImg = new JLabel();
+		lblImg.setBounds(12, 10, 95, 95);
+		panelImg.add(lblImg);
+			
+		btnAddImg = new JButton("사진 등록");
+		btnAddImg.setBounds(134, 29, 97, 48);
+		panelImg.add(btnAddImg);
+			
+		panelName = new JPanel();
+		panelName.setBounds(38, 66, 550, 60);
+		getContentPane().add(panelName);
+		panelName.setLayout(null);
+			
+		JLabel lblName = new JLabel("제목");
+		lblName.setHorizontalAlignment(SwingConstants.CENTER);
+		lblName.setBounds(20, 10, 65, 40);
+		panelName.add(lblName);
+			
 		txtName = new JTextField();
-		txtName.setBounds(202, 80, 364, 40);
-		contentPanel.add(txtName);
+		txtName.setBounds(120, 10, 400, 40);
+		panelName.add(txtName);
 		txtName.setColumns(10);
-		
+			
+		panelWriter = new JPanel();
+		panelWriter.setBounds(38, 130, 556, 66);
+		getContentPane().add(panelWriter);
+		panelWriter.setLayout(null);
+			
+		JLabel lblWriter = new JLabel("저자");
+		lblWriter.setHorizontalAlignment(SwingConstants.CENTER);
+		lblWriter.setBounds(20, 10, 65, 40);
+		panelWriter.add(lblWriter);
+			
 		txtWriter = new JTextField();
+		txtWriter.setBounds(120, 10, 400, 40);
+		panelWriter.add(txtWriter);
 		txtWriter.setColumns(10);
-		txtWriter.setBounds(202, 157, 364, 41);
-		contentPanel.add(txtWriter);
-		
+			
+		panelCategory = new JPanel();
+		panelCategory.setBounds(38, 195, 556, 62);
+		getContentPane().add(panelCategory);
+		panelCategory.setLayout(null);
+			
+		JLabel lblCategory = new JLabel("장르");
+		lblCategory.setBounds(20, 10, 65, 40);
+		panelCategory.add(lblCategory);
+		lblCategory.setHorizontalAlignment(SwingConstants.CENTER);
+			
 		txtCategory = new JTextField();
+		txtCategory.setBounds(120, 10, 400, 40);
+		panelCategory.add(txtCategory);
 		txtCategory.setColumns(10);
-		txtCategory.setBounds(202, 231, 364, 48);
-		contentPanel.add(txtCategory);
-		
+			
+		panelPublisher = new JPanel();
+		panelPublisher.setBounds(38, 256, 550, 66);
+		getContentPane().add(panelPublisher);
+		panelPublisher.setLayout(null);
+			
+		JLabel lblPublisher = new JLabel("출판사");
+		lblPublisher.setHorizontalAlignment(SwingConstants.CENTER);
+		lblPublisher.setBounds(20, 10, 65, 40);
+		panelPublisher.add(lblPublisher);
+			
 		txtPublisher = new JTextField();
+		txtPublisher.setBounds(120, 10, 400, 40);
+		panelPublisher.add(txtPublisher);
 		txtPublisher.setColumns(10);
-		txtPublisher.setBounds(202, 310, 364, 48);
-		contentPanel.add(txtPublisher);
-		
-		txtPubDate = new JTextField();
-		txtPubDate.setColumns(10);
-		txtPubDate.setBounds(202, 378, 364, 48);
-		contentPanel.add(txtPubDate);
-		{
-			btnSubmit = new JButton("등록");
-			btnSubmit.setBounds(150, 541, 93, 66);
-			contentPanel.add(btnSubmit);
-			getRootPane().setDefaultButton(btnSubmit);
-		}
-		{
-			btnExit = new JButton("돌아가기");
-			btnExit.setBounds(341, 541, 114, 66);
-			contentPanel.add(btnExit);
-			
-			lblState = new JLabel("상태");
-			lblState.setBounds(38, 462, 161, 40);
-			contentPanel.add(lblState);
-			
-			btnAddImg = new JButton("사진 등록");
-			btnAddImg.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
-					JFileChooser chooser = new JFileChooser();
-					int result = chooser.showOpenDialog(null);
-					if(result == JFileChooser.APPROVE_OPTION) {
-						selectedFile = chooser.getSelectedFile();
-						lblImg.setIcon(im.convToIcon(selectedFile));
-					}
+		btnAddImg.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				JFileChooser chooser = new JFileChooser();
+				int result = chooser.showOpenDialog(null);
+				if(result == JFileChooser.APPROVE_OPTION) {
+					selectedFile = chooser.getSelectedFile();
+					lblImg.setIcon(im.convToIcon(selectedFile));
 				}
-			});
-			btnAddImg.setBounds(469, 472, 97, 48);
-			contentPanel.add(btnAddImg);
+			}
+		});
 			
-			lblImg = new JLabel();
-			lblImg.setBounds(330, 436, 97, 95);
-			contentPanel.add(lblImg);
-			
-			cbxState = new JComboBox();
-			cbxState.addItem(OracleBookQuery.BOOK_STATE_SET);
-			cbxState.addItem(OracleBookQuery.BOOK_STATE_OUT);
-			cbxState.addItem(OracleBookQuery.BOOK_STATE_RSV);
-			cbxState.addItem(OracleBookQuery.BOOK_STATE_RSVSET);
-			cbxState.addItem(OracleBookQuery.BOOK_STATE_LOST);
-			cbxState.setBounds(135, 462, 114, 40);
-			contentPanel.add(cbxState);
-			
-			btnExit.addActionListener(new ActionListener() {
+		btnExit.addActionListener(new ActionListener() {
 				
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					dispose();
-				}
-			});
-			
-		}
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				dispose();
+			}
+		});	
 	} // end init
 	
 	private BookVO validCheck() {
@@ -225,15 +277,30 @@ public class BookUpdateDialog extends JDialog {
 		String state = cbxState.getSelectedItem().toString();
 		String img = null;
 		
-		if(name.length() * writer.length() * category.length() * publisher.length() * txtPubDate.getText().length() * state.length() == 0) {
+		if(name.length() * writer.length() * category.length() * publisher.length() * txtYear.getText().length() 
+				* txtMonth.getText().length() * txtDay.getText().length() * state.length() == 0) {
 			new AlertDialog("모든 필드 입력 필요");
 			return null;
 		}
 		if(selectedFile != null) {
 			img = selectedFile.getName();
 		}
-		LocalDate date = LocalDate.parse(txtPubDate.getText(), DateTimeFormatter.ofPattern("yyyyMMdd"));
-		LocalDateTime pubDate = LocalDateTime.of(date, LocalTime.of(0, 0, 0));
+		int year = 0, month = 0, day = 0;
+		
+		try {
+			year = Integer.parseInt(txtYear.getText());
+			month = Integer.parseInt(txtMonth.getText());
+			day = Integer.parseInt(txtDay.getText());
+		}catch(Exception e) {
+			new AlertDialog("잘못된 입력");
+			return null;
+		}
+		if(year < 0 || year > LocalDateTime.now().getYear() || month < 1 || month > 12 || day < 1 || day > 31) {
+			new AlertDialog("잘못된 날짜 형식");
+			return null;
+		}
+		
+		LocalDateTime pubDate = LocalDateTime.of(year, month, day, 0, 0, 0);
 		
 		return new BookVO(0, name, writer, category, publisher, pubDate, state, img);
 	} // end validCheck

@@ -2,7 +2,6 @@ package lib.view;
 
 import javax.swing.JComponent;
 import javax.swing.JButton;
-import javax.swing.JLabel;
 import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
 
@@ -13,8 +12,6 @@ import lib.model.BookVO;
 import javax.swing.JComboBox;
 import javax.swing.JTable;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.awt.event.ActionEvent;
 import javax.swing.JScrollPane;
@@ -22,23 +19,26 @@ import javax.swing.JPanel;
 
 
 public class BookManagerComp extends JComponent {
+	private static final long serialVersionUID = 1L;
+
 	private static final String SEARCHALL = "전체";
 
 	private JTextField txtSearch;
 	private DefaultTableModel tableModel;
 	private JTable tabSearch;
+	private JPanel panelMove;
+	private JButton btnToPrev;
+	private JButton btnToNext;
+	private JComboBox<String> cbxTag;
+	private String[] tag = {OracleBookQuery.NAME, OracleBookQuery.WRITER, OracleBookQuery.CATEGORY};
+
+	private static BookDAOImple dao;
 	private String[] tableCol = {"도서 코드", "도서 명", "저자", "카테고리", "출판사", "출판일", "상태"};
 	private Object[] books = new Object[tableCol.length];
-	private static BookDAOImple dao;
-	private JComboBox cbxTag;
-	private int selectedBookId = -1;
 	private ArrayList<BookVO> printedList;
 	private int currentPage = 1;
 	private String searchTarget = "";
 	private String searchMode = SEARCHALL;
-	private JPanel panelMove;
-	private JButton btnToPrev;
-	private JButton btnToNext;
 	
 	public BookManagerComp() {
 		dao = BookDAOImple.getInstance();
@@ -65,11 +65,8 @@ public class BookManagerComp extends JComponent {
 		add(txtSearch);
 		txtSearch.setColumns(10);
 		
-		cbxTag = new JComboBox();
+		cbxTag = new JComboBox<>(tag);
 		cbxTag.setBounds(38, 23, 95, 44);
-		cbxTag.addItem(OracleBookQuery.NAME);
-		cbxTag.addItem(OracleBookQuery.WRITER);
-		cbxTag.addItem(OracleBookQuery.CATEGORY);
 		add(cbxTag);
 		
 		JScrollPane scrollPane = new JScrollPane();
@@ -77,12 +74,22 @@ public class BookManagerComp extends JComponent {
 		add(scrollPane);
 		
 		tableModel = new DefaultTableModel(tableCol, 0) {
+			private static final long serialVersionUID = 2L;
+
 			@Override
 			public boolean isCellEditable(int row, int column) {
 				return false;
 			}
 		};
 		tabSearch = new JTable(tableModel);
+		tabSearch.setRowHeight(25);
+		tabSearch.getColumnModel().getColumn(0).setPreferredWidth(5);
+		tabSearch.getColumnModel().getColumn(1).setPreferredWidth(300);
+		tabSearch.getColumnModel().getColumn(2).setPreferredWidth(30);
+		tabSearch.getColumnModel().getColumn(3).setPreferredWidth(15);
+		tabSearch.getColumnModel().getColumn(4).setPreferredWidth(15);
+		tabSearch.getColumnModel().getColumn(5).setPreferredWidth(15);
+		tabSearch.getColumnModel().getColumn(6).setPreferredWidth(5);;
 		
 		scrollPane.setViewportView(tabSearch);
 		

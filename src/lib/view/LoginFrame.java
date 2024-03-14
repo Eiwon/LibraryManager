@@ -1,15 +1,12 @@
 package lib.view;
 
-import java.awt.BorderLayout;
-import java.awt.EventQueue;
-
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JPasswordField;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
-import lib.Interface.UISize;
 import lib.controller.UserDAOImple;
 import lib.controller.UserManager;
 import lib.model.UserVO;
@@ -18,27 +15,22 @@ import javax.swing.JLabel;
 import javax.swing.JTextField;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
-import java.awt.event.TextEvent;
-import java.awt.event.TextListener;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.regex.Pattern;
 import java.awt.event.ActionEvent;
 
 public class LoginFrame extends JFrame {
-
+	
+	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
 	private JPanel panelLogin;
 	private JPanel panelSignup;
 	private JTextField txtId;
-	private JTextField txtPw;
+	private JPasswordField txtPw;
 	private JTextField txtName;
 	private JTextField txtPhone;
 	private JTextField txtEmail;
 	private JTextField txtSignupId;
-	private JTextField txtSignupPw;
+	private JPasswordField txtSignupPw;
 	private JButton btnComplete = null;
 	private static final int frameX = 100;
 	private static final int frameY = 100;
@@ -63,8 +55,7 @@ public class LoginFrame extends JFrame {
 		setLoginPanel();
 		setSignupPanel();
 		panelSignup.setVisible(false);
-		
-	}
+	} // end LoginFrame
 	
 	public void setLoginPanel() {
 
@@ -74,21 +65,22 @@ public class LoginFrame extends JFrame {
 		panelLogin.setLayout(null);
 		
 		JLabel lblId = new JLabel("아이디");
-		lblId.setBounds(50, 31, 98, 28);
+		lblId.setBounds(50, 101, 98, 28);
 		panelLogin.add(lblId);
 		
 		JLabel lblPw = new JLabel("비밀번호");
-		lblPw.setBounds(54, 101, 98, 28);
+		lblPw.setBounds(50, 206, 98, 28);
 		panelLogin.add(lblPw);
 		
 		txtId = new JTextField();
-		txtId.setBounds(164, 25, 313, 42);
+		txtId.setBounds(164, 95, 313, 42);
 		panelLogin.add(txtId);
 		txtId.setColumns(10);
 		
-		txtPw = new JTextField();
+		txtPw = new JPasswordField();
 		txtPw.setColumns(10);
-		txtPw.setBounds(164, 95, 313, 42);
+		txtPw.setBounds(164, 200, 313, 42);
+		
 		panelLogin.add(txtPw);
 		
 		JButton btnLogin = new JButton("로그인");
@@ -107,7 +99,7 @@ public class LoginFrame extends JFrame {
 				}
 			}
 		});
-		btnLogin.setBounds(163, 191, 183, 36);
+		btnLogin.setBounds(164, 303, 183, 36);
 		panelLogin.add(btnLogin);
 		
 		JButton btnSignUp = new JButton("회원가입");
@@ -117,7 +109,7 @@ public class LoginFrame extends JFrame {
 				panelSignup.setVisible(true);
 			}
 		});
-		btnSignUp.setBounds(160, 257, 186, 42);
+		btnSignUp.setBounds(164, 382, 186, 42);
 		panelLogin.add(btnSignUp);
 	} // end setLoginPanel
 
@@ -180,10 +172,10 @@ public class LoginFrame extends JFrame {
 				validCheck();
 			}
 		}); // end btnIdCheckListener
-		btnIdCheck.setBounds(470, 61, UISize.btnWidth, UISize.btnHeight);
+		btnIdCheck.setBounds(470, 61, 100, 50);
 		panelSignup.add(btnIdCheck);
 		
-		txtSignupPw = new JTextField();
+		txtSignupPw = new JPasswordField();
 		txtSignupPw.setBounds(164, 124, 292, 38);
 		panelSignup.add(txtSignupPw);
 		txtSignupPw.setColumns(10);
@@ -211,7 +203,7 @@ public class LoginFrame extends JFrame {
 				}
 			}
 		}); // end btnComplete listener
-		btnComplete.setBounds(frameX + 50, frameY + 300, UISize.btnWidth, UISize.btnHeight);
+		btnComplete.setBounds(frameX + 50, frameY + 300, 100, 50);
 		panelSignup.add(btnComplete);
 		
 		JButton btnBack = new JButton("뒤로 가기");
@@ -220,29 +212,27 @@ public class LoginFrame extends JFrame {
 				goToBack();
 			}
 		});
-		btnBack.setBounds(frameX + 200, frameY + 300, UISize.btnWidth, UISize.btnHeight);
+		btnBack.setBounds(frameX + 200, frameY + 300, 100, 50);
 		panelSignup.add(btnBack);
 	} // end setSingupPanel
 	
 	private void validCheck() {
 		if(Pattern.matches(idRex, txtSignupId.getText())) {
 			UserVO vo = userDao.selectByID(txtSignupId.getText());
-			
 			if(vo == null){
 				new AlertDialog("사용할 수 있는 ID 입니다.");
 				validId = true;
 			}else {
 				new AlertDialog("이미 존재하는 ID 입니다.");
 			}
-			
 		}else {
 			new AlertDialog("잘못된 ID 형식");
 		}
-	}
+	} // end validCheck
 	
 	private boolean signup() {
 		String Id = txtSignupId.getText();
-		String pw = txtSignupPw.getText();
+		String pw = new String(txtSignupPw.getPassword());
 		String name = txtName.getText();
 		String phone = txtPhone.getText();
 		String email = txtEmail.getText();
@@ -271,22 +261,21 @@ public class LoginFrame extends JFrame {
 	} // end goToBack
 	
 	private UserVO login() {
-		
 		String userId = txtId.getText();
-		String pw = txtPw.getText();
+		char[] pwBuffer = txtPw.getPassword();
 		UserVO vo = null;
 		
-		if(userId.length() * pw.length() > 0) {
+		if(userId.length() * pwBuffer.length > 0) {
+			String pw = new String(pwBuffer);
 			vo = userDao.selectWithPw(userId, pw);
 			return vo;
 		}else {
 			new AlertDialog("아이디와 비밀번호를 입력해주세요.");
 		}
-		
 		return null;
 	} // end login
 
 	public UserVO getCurUser() {
 		return curUser;
-	}
+	} // end getCurUser
 }

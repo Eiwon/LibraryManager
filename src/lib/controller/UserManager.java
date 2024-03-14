@@ -1,8 +1,6 @@
 package lib.controller;
 
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
-
 import lib.Interface.UserDAO;
 import lib.model.UserVO;
 
@@ -55,7 +53,7 @@ public class UserManager {
 		String[] banInfo = dao.searchBlackList(userId);
 		
 		if(banInfo != null) { // 블랙리스트에 이미 등록된 유저라면
-			LocalDateTime releaseDate = LocalDateTime.parse(banInfo[3]);
+			LocalDateTime releaseDate = LocalDateTime.parse(banInfo[2]);
 			if(LocalDateTime.now().isBefore(releaseDate)) { // 아직 해제일 전이라면 
 				return true;
 			}else {

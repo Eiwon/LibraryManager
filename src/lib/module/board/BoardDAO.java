@@ -28,6 +28,9 @@ public interface BoardDAO {
 	// 태그 지정 검색
 	public ArrayList<PostVO> selectPostByTag(String tag, int page);
 	
+	// 글 조회수 +1
+	public int updateViewsUp(int postId);
+	
 	// 글 id 지정 댓글 검색
 	public ArrayList<ReplyVO> selectReplyById(int replyId, int page);
 	

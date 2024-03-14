@@ -1,7 +1,5 @@
 package lib.view;
 
-import java.awt.BorderLayout;
-
 import java.awt.FlowLayout;
 
 import javax.swing.JButton;
@@ -9,13 +7,10 @@ import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableModel;
 
 import lib.Interface.OracleBookQuery;
 import lib.controller.BookDAOImple;
-import lib.controller.UserDAOImple;
 import lib.controller.UserManager;
-import lib.model.BookVO;
 
 import java.awt.event.ActionListener;
 import java.time.LocalDateTime;
@@ -26,14 +21,15 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 
 public class MyInfoDialog extends JDialog {
-
+	
+	private static final long serialVersionUID = 1L;
 	private final JPanel contentPanel = new JPanel();
-	private BookDAOImple dao;
 	private JTable table;
+	private BookDAOImple dao;
 	private DefaultTableModel tableModel;
 	private String[] tableCol = {"현재 상태", "도서 코드", "제목", "저자", "카테고리", "상태", "대출/예약일", "반납/예약만료일"};
 	private Object[] info = new Object[8];
-	ArrayList<ArrayList<String>> printedList;
+	private ArrayList<ArrayList<String>> printedList;
 	
 	public MyInfoDialog() {
 		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
@@ -62,7 +58,11 @@ public class MyInfoDialog extends JDialog {
 				JButton btnExtend = new JButton("대출 기간 연장");
 				btnExtend.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
-						extendBook();
+						if(UserManager.isBan()) {
+							new AlertDialog("기간 연장이 불가능한 상태입니다.");
+						}else {
+							extendBook();
+						}
 					}
 				});
 				buttonPane.add(btnExtend);
@@ -85,6 +85,8 @@ public class MyInfoDialog extends JDialog {
 		
 		
 		tableModel = new DefaultTableModel(tableCol, 0) {
+			private static final long serialVersionUID = 2L;
+
 			@Override
 			public boolean isCellEditable(int row, int column) {
 				return false;

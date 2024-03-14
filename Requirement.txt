@@ -32,72 +32,69 @@
 
 테이블 명 : BOOK
 컬럼 : 
-BOOK_ID      NUMBER   도서 ID - PK
-NAME      VARCHAR2   도서 명
-WRITER      VARCHAR2   저자
-CATEGORY   VARCHAR2   카테고리
-PUBLISHER   VARCHAR2   출판사
-PUB_DATE   DATE      출판일
-STATE      VARCHAR2   도서 상태(정상, 대출 중, 예약 중, 분실)
+BOOK_ID      	NUMBER   	도서 ID - PK
+NAME      	VARCHAR2   	도서 명
+WRITER      	VARCHAR2   	저자
+CATEGORY  	VARCHAR2   	카테고리
+PUBLISHER   	VARCHAR2   	출판사
+PUB_DATE   	DATE      	출판일
+STATE      	VARCHAR2  	도서 상태(정상, 대출 중, 예약 중, 분실)
+IMAGE      	VARCHAR2      	표지 이미지 파일명
 
-IMAGE      ????      표지 이미지 - NULLABLE
 
-
-유저 정보 관리 테이블
 테이블 명 : USER_INFO
 컬럼 : 
-USER_ID      VARCAHR2   유저 ID - PK
-PW      VARCHAR2   비밀번호
-NAME      VARCHAR2    이름
-PHONE      VARCHAR2    전화번호
-EMAIL       VARCHAR2   이메일
-AUTH      VARCHAR2   권한 (ADMIN / USER)  - default = USER 
-
+USER_ID      	VARCAHR2   	유저 ID - PK
+PW      		VARCHAR2   	비밀번호
+NAME      	VARCHAR2    	이름
+PHONE      	VARCHAR2    	전화번호
+EMAIL       	VARCHAR2   	이메일
+AUTH      	VARCHAR2   	권한 (ADMIN / USER)  - default = USER 
 
 
 테이블 명 : BALCK_LIST
 컬럼 : 
-USER_ID       VARCHAR2   유저 ID - PK
-BAN_DATE   DATE      대출 금지당한 날짜
-RELEASE_DATE   DATE      대출 금지 해제 날짜      
+USER_ID       	VARCHAR2   	유저 ID - PK
+BAN_DATE   	DATE      	대출 금지당한 날짜
+RELEASE_DATE   	DATE      	대출 금지 해제 날짜      
 
 
-대출 / 예약 도서
 테이블 명 : CHECK_OUT
 컬럼 : 
-BOOK_ID      NUMBER   도서 ID   - PK
-USER_ID      VARCHAR2   유저 ID   - FK
-STATE      VARCHAR2   대출 / 예약 - FK
-CHECK_OUT_DATE   DATE      대출 일자
-CHECK_IN_DATE   DATE      반납 예정 일자
+BOOK_ID      	NUMBER   	도서 ID   - PK
+USER_ID      	VARCHAR2  	유저 ID   - FK
+STATE      	VARCHAR2   	대출 / 예약
+CHECK_OUT_DATE 	DATE      	대출 일자
+CHECK_IN_DATE   	DATE      	반납 예정 일자
 
 
 
-테이블 명 : REQUIREMENT
+테이블 명 : POST
 컬럼 :
-MSG_ID      NUMBER      요구사항 ID - PK
-TITLE      VARCHAR2   요구사항 제목
-CONTENT   VARCHAR2   요구사항 내용
-TYPE      VARCHAR2   문의 종류
-DATE      DATE      문의 날짜
-USER_ID      VARCHAR2   문의자 ID - FK
-ISREAD      NUMBER      메시지를 읽었는지 여부
+POST_ID		NUMBER		게시물 ID
+POST_TITLE	VARCHAR2	제목
+POST_CONTENT	VARCHAR2	내용
+USER_ID		VARCHAR2	유저 ID - FK
+TAG		VARCHAR2	글 분류
+VIEWS		NUMBER		조회수
+WRITE_DATE	DATE		작성일자
 
-==> 게시판 형식으로 변경
-postId
-postTitle
-postContent
-userId
-tag
-view
-writeDate
+테이블 명 : REPLY
+REPLY_ID		NUMBER		댓글 ID			
+POST_ID		NUMBER		댓글이 달린 게시물 ID
+USER_ID		VARCHAR2	작성자 ID - FK
+REPLY_CONTENT	VARCHAR2	댓글 내용
+WRITE_DATE	DATE		작성일자
 
-reply
-replyId
-postId
-userId
-content
-writeDate
+테이블 명 : SEAT
+SEAT_ID		VARCHAR2	좌석 ID - PK
+POSITION_X	NUMBER		좌석 X 좌표
+POSITION_Y	NUMBER		좌석 Y 좌표
+USER_ID		VARCHAR2	유저 ID - FK
+START_TIME	DATE		좌석 설정 시간
+END_TIME	DATE		좌석 반납 시간
+STATE		VARCHAR2	좌석 상태 (EMPTY / OCCUPIED)
+
 
 4. 데이터 구조(VO)
 BookVO
@@ -561,4 +558,11 @@ state
 
 
 한 명당 1자리만 선택할 수 있게 조정
+
+에디터 모드
+id를 좌표값으로? "x.y"
+마우스 클릭 위치에 좌석 생성, list에 추가
+좌석 클릭시 좌석 제거, list에서 제거
+
+
 

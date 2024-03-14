@@ -1,12 +1,7 @@
 package lib.view;
 
-import java.awt.BorderLayout;
-import java.awt.FlowLayout;
-
 import javax.swing.JButton;
 import javax.swing.JDialog;
-import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
 import javax.swing.JLabel;
 import java.awt.Font;
 import javax.swing.SwingConstants;
@@ -14,6 +9,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
 public class AlertDialog extends JDialog {
+	private static final long serialVersionUID = 1L;
 
 	public AlertDialog(String msg) {
 		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
@@ -38,5 +34,5 @@ public class AlertDialog extends JDialog {
 		lblMsg.setHorizontalAlignment(SwingConstants.CENTER);
 		lblMsg.setFont(new Font("궁서", Font.BOLD, 43));
 		
-	}
-}
+	} // end AlertDialog()
+} // end AlertDialog

@@ -23,7 +23,7 @@ public class BoardDAOImple implements BoardDAO, OracleBoardQuery{
 			instance = new BoardDAOImple();
 		}
 		return instance;
-	}
+	} // end getInstance
 
 	@Override
 	public int insertPost(PostVO vo) {
@@ -85,7 +85,7 @@ public class BoardDAOImple implements BoardDAO, OracleBoardQuery{
 		}
 		
 		return res;
-	}
+	} // end updatePost
 
 	@Override
 	public int deletePost(int postId) {
@@ -113,7 +113,7 @@ public class BoardDAOImple implements BoardDAO, OracleBoardQuery{
 		}
 		
 		return res;
-	}
+	} // end deletePost
 
 	@Override
 	public ArrayList<PostVO> selectPage(int page) {
@@ -177,7 +177,7 @@ public class BoardDAOImple implements BoardDAO, OracleBoardQuery{
 		}
 		
 		return vo;
-	}
+	} // selectPostById
 
 	@Override
 	public ArrayList<PostVO> selectPostByUid(String userId, int page) {
@@ -243,7 +243,7 @@ public class BoardDAOImple implements BoardDAO, OracleBoardQuery{
 		}
 		
 		return list;
-	}
+	} // end selectPostByTitle
 
 	@Override
 	public ArrayList<PostVO> selectPostByTag(String tag, int page) {
@@ -276,7 +276,7 @@ public class BoardDAOImple implements BoardDAO, OracleBoardQuery{
 		}
 		
 		return list;
-	}
+	} // end selectPostByTag
 
 	@Override
 	public ArrayList<ReplyVO> selectReplyById(int postId, int page) {
@@ -309,7 +309,7 @@ public class BoardDAOImple implements BoardDAO, OracleBoardQuery{
 		}
 		
 		return list;
-	}
+	} // selectReplyById
 
 	@Override
 	public int insertReply(ReplyVO vo) {

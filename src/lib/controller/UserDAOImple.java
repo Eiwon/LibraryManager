@@ -7,6 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 
 import lib.Interface.OracleBookQuery;
 import lib.Interface.OracleUserQuery;
@@ -20,7 +21,6 @@ public class UserDAOImple implements UserDAO, OracleUserQuery{
 	PreparedStatement pstmt = null;
 	private static UserDAOImple instance = null;
 	
-	//싱글톤
 	private UserDAOImple() {}
 	
 	public static UserDAOImple getInstance() {
@@ -28,7 +28,7 @@ public class UserDAOImple implements UserDAO, OracleUserQuery{
 			instance = new UserDAOImple();
 		}
 		return instance;
-	}
+	} // end getInstance
 
 	@Override
 	public int insertUser(UserVO vo) {
@@ -129,7 +129,7 @@ public class UserDAOImple implements UserDAO, OracleUserQuery{
 		}
 		
 		return vo;
-	}
+	} // end selectWithPw
 
 	@Override
 	public int registerBlackList(String userId, LocalDateTime banDate, LocalDateTime releaseDate) {
@@ -192,7 +192,7 @@ public class UserDAOImple implements UserDAO, OracleUserQuery{
 		}
 		
 		return res;
-	}
+	} // end searchBlackList
 
 	@Override
 	public int deleteFromBlackList(String userId) {
@@ -256,5 +256,68 @@ public class UserDAOImple implements UserDAO, OracleUserQuery{
 		return res;
 	} // getCheckinDate
 
+	@Override
+	public ArrayList<Object[]> selectOverdueBook() {
+		System.out.println("userdaoimple : selectOverdueBook");
+		ArrayList<Object[]> res = new ArrayList<>();
+		Object[] arr;
+		try {
+			DriverManager.registerDriver(new OracleDriver());
+			conn = DriverManager.getConnection(URL, USER, PASSWORD);
+			pstmt = conn.prepareStatement(SQL_SELECT_OVERDUE_BOOK);
+			
+			ResultSet rs = pstmt.executeQuery();
+			while(rs.next()) { 
+				arr = new Object[7];
+				arr[0] = rs.getInt(1);
+				arr[1] = rs.getString(2);
+				arr[2] = rs.getString(3);
+				arr[3] = rs.getTimestamp(4).toLocalDateTime().toLocalDate();
+				arr[4] = rs.getString(5);
+				arr[5] = rs.getString(6);
+				arr[6] = rs.getString(7);
+				res.add(arr);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				conn.close();
+				pstmt.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		return res;
+	}
 
+	@Override
+	public int getUserNum() {
+		System.out.println("userdaoimple : getUserNum");
+		int res = 0;
+		
+		try {
+			DriverManager.registerDriver(new OracleDriver());
+			conn = DriverManager.getConnection(URL, USER, PASSWORD);
+			pstmt = conn.prepareStatement(SQL_COUNT_USER);
+			
+			ResultSet rs = pstmt.executeQuery();
+			if(rs.next() && rs.getString(1) != null) { 
+				res = rs.getInt(1);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				conn.close();
+				pstmt.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		return res;
+	}
+	
 }

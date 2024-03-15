@@ -106,5 +106,9 @@ public interface OracleBookQuery {
 	// CHECK_OUT 테이블에서 BOOK_ID를 지정하여 반납기한 재설정
 	public static final String SQL_UPDATE_CHECK_IN_DATE =
 			"UPDATE " + TABLE_CHECK_OUT + " SET " + CHECK_IN_DATE + " = ? WHERE " + BOOK_ID + " = ?";
+
 	
+	// 등록된 도서 수 검색
+	public static final String SQL_SELECT_ALL_NUM = 
+			"SELECT COUNT(*) FROM " + TABLE_BOOK;
 }

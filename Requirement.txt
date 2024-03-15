@@ -17,6 +17,7 @@
 - 유저 등록 : 새로운 관리자 또는 유저를 등록 가능
 - 리포트 : 도서 대출 현황, 연체 중인 도서 목록, 대출 횟수가 많은 도서 목록, 유저 수, 문의 내역 등 확인 가능
 
+
 일반 유저
 - 도서 검색, 대출 예약/연장, 내 정보(대출/예약 내역, 대출 가능 도서량 등) 확인, 회원 등록 / 로그인 / 로그아웃
 - 도서 검색 : 비회원도 가능, 관리자 모드와 동일(수정, 삭제는 불가)
@@ -557,12 +558,27 @@ END_TIME DATE
 state
 
 
-한 명당 1자리만 선택할 수 있게 조정
 
-에디터 모드
-id를 좌표값으로? "x.y"
-마우스 클릭 위치에 좌석 생성, list에 추가
-좌석 클릭시 좌석 제거, list에서 제거
+- 리포트 : 도서 대출 현황, 연체 중인 도서 목록, 대출 횟수가 많은 도서 목록, 유저 수, 문의 내역 등 확인 가능
+연체 중인 도서 id, 도서명 , 연체자 id, 반납기한 order by 반납기한 오름차순
+BLACKLIST 유저들의 CHECK_OUT 정보, CHECK_OUT 정보의 BOOK_ID에 해당하는 BOOK 정보
+SELECT  FROM BLACK_LIST JOIN CHECK_OUT
+ON B.USER_ID = C.USER_ID
 
+연체 중인 도서 목록
+
+CHECK_OUT 테이블의 반납기한이 지난 유저의 유저ID, 도서ID, 반납기한을 가져온다
+ㄴ해당 도서 ID의 도서 제목을 BOOK 테이블에서 가져온다
+ㄴ해당 유저 ID의 신상을 USER_INFO 테이블에서 가져온다
+
+SELECT BC.*, U.NAME, U.PHONE, U.EMAIL
+FROM (
+SELECT B.BOOK_ID, B.NAME, C.USER_ID, C.CHECK_IN_DATE
+FROM BOOK B JOIN CHECK_OUT C
+ON B.BOOK_ID = C.BOOK_ID
+WHERE C.CHECK_IN_DATE < SYSDATE
+) BC JOIN USER_INFO U
+ON BC.USER_ID = U.USER_ID
+ORDER BY BC.CHECK_IN_DATE;
 
 

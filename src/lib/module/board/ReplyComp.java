@@ -27,14 +27,14 @@ public class ReplyComp extends JComponent {
 	private JTable table;
 	private JPanel panelSbtnSet;
 	private JTextArea txtReply;
-	private BoardDAOImple dao;
+	private BoardDAO dao;
 
 	private DefaultTableModel tableModel;
 	private String[] tableCol = {"ID", "내용", "작성일자"};
 	private Object[] rowObj = new Object[3];
 	private int currentPage = 1;
 	private int postId;
-	private ArrayList<ReplyVO> printedList;
+	private ArrayList<ReplyVO> printedList = new ArrayList<>();
 	
 	public ReplyComp() {
 		dao = BoardDAOImple.getInstance();
@@ -91,7 +91,7 @@ public class ReplyComp extends JComponent {
 				String content = txtReply.getText();
 				if (content.length() > 0) {
 					insertReply(content);
-					printReply();
+					printReply(postId);
 					txtReply.setText("");
 				}
 			}
@@ -103,7 +103,7 @@ public class ReplyComp extends JComponent {
 		btnToNext.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				currentPage++;
-				printReply();
+				printReply(postId);
 			}
 		});
 		btnToNext.setBounds(62, 0, 65, 43);
@@ -113,7 +113,7 @@ public class ReplyComp extends JComponent {
 		btnToPrev.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				currentPage = Math.max(1, currentPage -1);
-				printReply();
+				printReply(postId);
 			}
 		});
 		btnToPrev.setBounds(0, 0, 65, 43);
@@ -130,7 +130,7 @@ public class ReplyComp extends JComponent {
 			public void actionPerformed(ActionEvent e) {
 				updateReply();
 				txtReply.setText("");
-				printReply();
+				printReply(postId);
 			}
 		});
 		btnUpdate.setBounds(0, 0, 62, 36);
@@ -141,7 +141,7 @@ public class ReplyComp extends JComponent {
 			public void actionPerformed(ActionEvent e) {
 				deleteReply();
 				txtReply.setText("");
-				printReply();
+				printReply(postId);
 			}
 		});
 		btnDelete.setBounds(61, 0, 62, 36);
@@ -161,7 +161,7 @@ public class ReplyComp extends JComponent {
 		ReplyVO vo = new ReplyVO(replyId, 0, "", content, null);
 		int res = dao.updateReply(vo);
 		if(res == 1) {
-			new AlertDialog("수정 성공");
+			AlertDialog.printMsg("수정 성공");
 		}
 	} // end updateReply
 	
@@ -171,13 +171,21 @@ public class ReplyComp extends JComponent {
 			int replyId = printedList.get(selectedRow).getId();
 			int res = dao.deleteReply(replyId);
 			if(res == 1) {
-				new AlertDialog("삭제 성공");
+				AlertDialog.printMsg("삭제 성공");
 			}
 		}
 	} // end deleteReply
 	
-	public void printReply() {
-		printedList = dao.selectReplyById(postId, currentPage);
+	public void printReply(int postId) {
+		this.postId = postId;
+		ArrayList<ReplyVO> list = dao.selectReplyById(postId, currentPage);
+		
+		if(list.size() == 0 && currentPage > 1) {
+			currentPage = Math.max(1, currentPage -1);
+		}else {
+			printedList = list;
+		}
+		
 		tableModel.setRowCount(0);
 		
 		for(ReplyVO vo : printedList) {
@@ -186,15 +194,12 @@ public class ReplyComp extends JComponent {
 			rowObj[2] = vo.getWriteDate().toString();
 			tableModel.addRow(rowObj);
 		}
-	}
-	public void setPostId(int postId) {
-		this.postId = postId;
-	}
+	} // end printReply
 	
 	public boolean hasAuth(int selectedRow) {
 		if(UserManager.getUserAuth().equals(OracleUserQuery.AUTH_ADMIN) 
 				|| printedList.get(selectedRow).getUserId().equals(UserManager.getUserId())) {
 			return true; // 현재 계정 권한이 관리자 권한이거나 userId가 선택된 댓글 작성자 userId와 같을 경우
 		}else return false;
-	}
+	} // end hasAuth
 }

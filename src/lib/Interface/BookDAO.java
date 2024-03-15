@@ -28,4 +28,6 @@ public interface BookDAO {
 	public int updateByBookId(String state, int bookId);
 	
 	public int updateCheckinDate(int bookId, LocalDateTime checkinDate);
+	
+	public int getBookNum();
 }

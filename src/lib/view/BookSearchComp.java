@@ -5,6 +5,7 @@ import javax.swing.JButton;
 import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
 
+import lib.Interface.BookDAO;
 import lib.Interface.OracleBookQuery;
 import lib.controller.BookDAOImple;
 import lib.model.BookVO;
@@ -18,32 +19,39 @@ import javax.swing.JScrollPane;
 import javax.swing.JPanel;
 
 
-public class BookManagerComp extends JComponent {
+public class BookSearchComp extends JComponent {
 	private static final long serialVersionUID = 1L;
 
 	private static final String SEARCHALL = "전체";
 
-	private JTextField txtSearch;
 	private DefaultTableModel tableModel;
 	private JTable tabSearch;
-	private JPanel panelMove;
-	private JButton btnToPrev;
-	private JButton btnToNext;
-	private JComboBox<String> cbxTag;
-	private String[] tag = {OracleBookQuery.NAME, OracleBookQuery.WRITER, OracleBookQuery.CATEGORY};
-
-	private static BookDAOImple dao;
 	private String[] tableCol = {"도서 코드", "도서 명", "저자", "카테고리", "출판사", "출판일", "상태"};
 	private Object[] books = new Object[tableCol.length];
+	
+	private static BookDAO dao;
 	private ArrayList<BookVO> printedList;
 	private int currentPage = 1;
 	private String searchTarget = "";
 	private String searchMode = SEARCHALL;
 	
-	public BookManagerComp() {
+	public BookSearchComp() {
 		dao = BookDAOImple.getInstance();
 		
 		JButton btnSearch = new JButton("검색");
+		btnSearch.setBounds(816, 23, 158, 44);
+		add(btnSearch);
+		
+		JTextField txtSearch = new JTextField();
+		txtSearch.setBounds(145, 24, 659, 44);
+		add(txtSearch);
+		txtSearch.setColumns(10);
+		
+		String[] tag = {OracleBookQuery.NAME, OracleBookQuery.WRITER, OracleBookQuery.CATEGORY};
+		JComboBox<String> cbxTag = new JComboBox<>(tag);
+		cbxTag.setBounds(38, 23, 95, 44);
+		add(cbxTag);
+
 		btnSearch.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if(txtSearch.getText().length() == 0) {
@@ -55,19 +63,7 @@ public class BookManagerComp extends JComponent {
 				currentPage = 1;
 				search();
 			}
-
-		});
-		btnSearch.setBounds(816, 23, 158, 44);
-		add(btnSearch);
-		
-		txtSearch = new JTextField();
-		txtSearch.setBounds(145, 24, 659, 44);
-		add(txtSearch);
-		txtSearch.setColumns(10);
-		
-		cbxTag = new JComboBox<>(tag);
-		cbxTag.setBounds(38, 23, 95, 44);
-		add(cbxTag);
+		});  
 		
 		JScrollPane scrollPane = new JScrollPane();
 		scrollPane.setBounds(35, 78, 939, 452);
@@ -93,12 +89,12 @@ public class BookManagerComp extends JComponent {
 		
 		scrollPane.setViewportView(tabSearch);
 		
-		panelMove = new JPanel();
+		JPanel panelMove = new JPanel();
 		panelMove.setBounds(367, 540, 230, 44);
 		add(panelMove);
 		panelMove.setLayout(null);
 		
-		btnToPrev = new JButton("이전");
+		JButton btnToPrev = new JButton("이전");
 		btnToPrev.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				currentPage = Math.max(1, currentPage -1);
@@ -108,7 +104,7 @@ public class BookManagerComp extends JComponent {
 		btnToPrev.setBounds(12, 10, 97, 23);
 		panelMove.add(btnToPrev);
 		
-		btnToNext = new JButton("다음");
+		JButton btnToNext = new JButton("다음");
 		btnToNext.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				currentPage++;
@@ -118,16 +114,23 @@ public class BookManagerComp extends JComponent {
 		btnToNext.setBounds(121, 10, 97, 23);
 		panelMove.add(btnToNext);
 
-	}
+	} // end bookManagerComp
 	
 	private void search() {
+		ArrayList<BookVO> list;
 		if(searchMode.equals(SEARCHALL)) {
-			printedList = dao.selectAll(currentPage);
+			list = dao.selectAll(currentPage);
 		}else {
-			printedList = dao.selectByValue(searchMode, searchTarget, currentPage);
+			list = dao.selectByValue(searchMode, searchTarget, currentPage);	
+		}
+		
+		if(list.size() == 0 && currentPage > 1) {
+			currentPage = Math.max(1, currentPage - 1);
+		}else {
+			printedList = list;
 		}
 		printTable(printedList);
-	}
+	} // end search
 	
 	
 	private void printTable(ArrayList<BookVO> list) {

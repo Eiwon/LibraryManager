@@ -7,6 +7,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import lib.Interface.UserDAO;
 import lib.controller.UserDAOImple;
 import lib.controller.UserManager;
 import lib.model.UserVO;
@@ -14,38 +15,27 @@ import lib.model.UserVO;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 import javax.swing.JButton;
+import javax.swing.JDialog;
+
 import java.awt.event.ActionListener;
 import java.util.regex.Pattern;
 import java.awt.event.ActionEvent;
 
-public class LoginFrame extends JFrame {
+public class LoginDialog extends JDialog {
 	
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
 	private JPanel panelLogin;
 	private JPanel panelSignup;
-	private JTextField txtId;
-	private JPasswordField txtPw;
-	private JTextField txtName;
-	private JTextField txtPhone;
-	private JTextField txtEmail;
-	private JTextField txtSignupId;
-	private JPasswordField txtSignupPw;
-	private JButton btnComplete = null;
-	private static final int frameX = 100;
-	private static final int frameY = 100;
-	private static final int frameWidth = 600;
-	private static final int frameHeight = 600;
-	
+
 	private String idRex = "^[a-zA-Z][a-zA-Z0-9]{1,20}$";
-	
-	private UserDAOImple userDao = null;
+	private UserDAO userDao = null;
 	private boolean validId = false;
-	private UserVO curUser = null;
 	
-	public LoginFrame() {
+	public LoginDialog() {
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		setBounds(frameX, frameY, frameWidth, frameHeight);
+		setVisible(true);
+		setBounds(750, 300, 600, 600);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
@@ -55,7 +45,7 @@ public class LoginFrame extends JFrame {
 		setLoginPanel();
 		setSignupPanel();
 		panelSignup.setVisible(false);
-	} // end LoginFrame
+	} // end LoginDialog
 	
 	public void setLoginPanel() {
 
@@ -72,12 +62,12 @@ public class LoginFrame extends JFrame {
 		lblPw.setBounds(50, 206, 98, 28);
 		panelLogin.add(lblPw);
 		
-		txtId = new JTextField();
+		JTextField txtId = new JTextField();
 		txtId.setBounds(164, 95, 313, 42);
 		panelLogin.add(txtId);
 		txtId.setColumns(10);
 		
-		txtPw = new JPasswordField();
+		JPasswordField txtPw = new JPasswordField();
 		txtPw.setColumns(10);
 		txtPw.setBounds(164, 200, 313, 42);
 		
@@ -88,12 +78,11 @@ public class LoginFrame extends JFrame {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				curUser = login();
+				UserVO curUser = login(txtId.getText(), String.valueOf(txtPw.getPassword()));
 				if(curUser == null) {
-					new AlertDialog("잘못된 아이디 또는 비밀번호 입니다.");
+					AlertDialog.printMsg("잘못된 아이디 또는 비밀번호 입니다.");
 				}else {
-					new AlertDialog("로그인 성공");
-					
+					AlertDialog.printMsg("로그인 성공");
 					UserManager.setCurrentUser(curUser);
 					dispose();
 				}
@@ -107,6 +96,8 @@ public class LoginFrame extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				panelLogin.setVisible(false);
 				panelSignup.setVisible(true);
+				txtId.setText("");
+				txtPw.setText("");
 			}
 		});
 		btnSignUp.setBounds(164, 382, 186, 42);
@@ -144,11 +135,11 @@ public class LoginFrame extends JFrame {
 		lblSignup.setBounds(156, 0, 227, 38);
 		panelSignup.add(lblSignup);
 		
-		txtSignupId = new JTextField();
-		txtSignupId.setBounds(164, 61, 292, 38);
-		panelSignup.add(txtSignupId);
-		txtSignupId.setColumns(10);
-		txtSignupId.getDocument().addDocumentListener(new DocumentListener() {
+		JTextField txtId = new JTextField();
+		txtId.setBounds(164, 61, 292, 38);
+		panelSignup.add(txtId);
+		txtId.setColumns(10);
+		txtId.getDocument().addDocumentListener(new DocumentListener() {
 			
 			@Override
 			public void removeUpdate(DocumentEvent e) {
@@ -169,90 +160,98 @@ public class LoginFrame extends JFrame {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				validCheck();
+				validId = isValidId(txtId.getText());
 			}
 		}); // end btnIdCheckListener
 		btnIdCheck.setBounds(470, 61, 100, 50);
 		panelSignup.add(btnIdCheck);
 		
-		txtSignupPw = new JPasswordField();
-		txtSignupPw.setBounds(164, 124, 292, 38);
-		panelSignup.add(txtSignupPw);
-		txtSignupPw.setColumns(10);
+		JPasswordField txtPw = new JPasswordField();
+		txtPw.setBounds(164, 124, 292, 38);
+		panelSignup.add(txtPw);
+		txtPw.setColumns(10);
 		
-		txtName = new JTextField();
+		JTextField txtName = new JTextField();
 		txtName.setColumns(10);
 		txtName.setBounds(164, 180, 292, 38);
 		panelSignup.add(txtName);
 		
-		txtPhone = new JTextField();
+		JTextField txtPhone = new JTextField();
 		txtPhone.setColumns(10);
 		txtPhone.setBounds(164, 241, 292, 38);
 		panelSignup.add(txtPhone);
 		
-		txtEmail = new JTextField();
+		JTextField txtEmail = new JTextField();
 		txtEmail.setColumns(10);
 		txtEmail.setBounds(164, 303, 292, 38);
 		panelSignup.add(txtEmail);
 		
-		btnComplete = new JButton("가입하기");
+		JButton btnComplete = new JButton("가입하기");
 		btnComplete.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if(signup()) {
+				if(signup(txtId.getText(), String.valueOf(txtPw.getPassword()), txtName.getText(),
+						txtPhone.getText(), txtEmail.getText())) {
+					txtId.setText("");
+					txtPw.setText("");
+					txtName.setText("");
+					txtPhone.setText("");
+					txtEmail.setText("");
 					goToBack();	
 				}
 			}
 		}); // end btnComplete listener
-		btnComplete.setBounds(frameX + 50, frameY + 300, 100, 50);
+		btnComplete.setBounds(150, 400, 100, 50);
 		panelSignup.add(btnComplete);
 		
 		JButton btnBack = new JButton("뒤로 가기");
 		btnBack.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				txtId.setText("");
+				txtPw.setText("");
+				txtPhone.setText("");
+				txtEmail.setText("");
+				txtName.setText("");
 				goToBack();
 			}
 		});
-		btnBack.setBounds(frameX + 200, frameY + 300, 100, 50);
+		btnBack.setBounds(300, 400, 100, 50);
 		panelSignup.add(btnBack);
 	} // end setSingupPanel
 	
-	private void validCheck() {
-		if(Pattern.matches(idRex, txtSignupId.getText())) {
-			UserVO vo = userDao.selectByID(txtSignupId.getText());
-			if(vo == null){
-				new AlertDialog("사용할 수 있는 ID 입니다.");
-				validId = true;
-			}else {
-				new AlertDialog("이미 존재하는 ID 입니다.");
-			}
+	private boolean isValidId(String userId) {
+		String inputId = userId;
+		if(!Pattern.matches(idRex, inputId)) {
+			AlertDialog.printMsg("잘못된 ID 형식");
+			return false;
+		}
+		UserVO vo = userDao.selectByID(inputId);
+		if(vo == null){
+			AlertDialog.printMsg("사용할 수 있는 ID 입니다.");
+			return true;
 		}else {
-			new AlertDialog("잘못된 ID 형식");
+			AlertDialog.printMsg("이미 존재하는 ID 입니다.");
+			return false;
 		}
 	} // end validCheck
 	
-	private boolean signup() {
-		String Id = txtSignupId.getText();
-		String pw = new String(txtSignupPw.getPassword());
-		String name = txtName.getText();
-		String phone = txtPhone.getText();
-		String email = txtEmail.getText();
-		if(pw.length() * name.length() * phone.length() * email.length() != 0) {
+	private boolean signup(String userId, String pw, String name, String phone, String email) {
+		if(pw.length() * name.length() * phone.length() * email.length() == 0) {
 			// 입력되지 않은 필드가 있는지 확인
-			if(validId == true) {
-				int res = userDao.insertUser(new UserVO(Id, pw, name, phone, email));
-				if(res == 1) {
-					new AlertDialog("유저 등록 성공");
-					return true;
-				}else {
-					new AlertDialog("유저 등록 실패");
-				}
-			} else {
-				new AlertDialog("아이디 중복 체크 필요");
-			}
-		}else {
-			new AlertDialog("모든 필드 입력 필요");
+			AlertDialog.printMsg("모든 필드 입력 필요");
+			return false;
 		}
-		return false;
+		if(validId == false) {
+			AlertDialog.printMsg("아이디 중복 체크 필요");
+			return false;
+		}
+		int res = userDao.insertUser(new UserVO(userId, pw, name, phone, email));
+		if(res == 1) {
+			AlertDialog.printMsg("유저 등록 성공");
+			return true;
+		}else {
+			AlertDialog.printMsg("유저 등록 실패");
+			return false;
+		}
 	} // end signup
 	
 	private void goToBack() {
@@ -260,22 +259,14 @@ public class LoginFrame extends JFrame {
 		panelSignup.setVisible(false);
 	} // end goToBack
 	
-	private UserVO login() {
-		String userId = txtId.getText();
-		char[] pwBuffer = txtPw.getPassword();
-		UserVO vo = null;
+	private UserVO login(String userId, String pw) {
 		
-		if(userId.length() * pwBuffer.length > 0) {
-			String pw = new String(pwBuffer);
-			vo = userDao.selectWithPw(userId, pw);
-			return vo;
+		if(userId.length() * pw.length() > 0) {
+			return userDao.selectWithPw(userId, pw);
 		}else {
-			new AlertDialog("아이디와 비밀번호를 입력해주세요.");
+			AlertDialog.printMsg("아이디와 비밀번호를 입력해주세요.");
 		}
 		return null;
 	} // end login
-
-	public UserVO getCurUser() {
-		return curUser;
-	} // end getCurUser
+	
 }

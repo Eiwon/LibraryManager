@@ -37,16 +37,13 @@ public class BoardDialog extends JDialog {
 	private JPanel panelRead;
 	private JPanel writeBtnSet;
 	private JPanel readBtnSet;
-	private JPanel panelSearch;
 	private JTextField txtTitle;
 	private JTextField txtReadTitle;
 	private JTextField txtReadContent;
 	private JTextField txtTarget;
 	private JTextField txtContent;
-	private JButton btnBack;
 	private JButton btnDelete;
 	private JButton btnUpdate;
-	private JButton btnSearch;
 	private JTable table;
 	private DefaultTableModel tableModel;
 	private JComboBox<String> cbxTarget;
@@ -55,7 +52,7 @@ public class BoardDialog extends JDialog {
 
 	private ReplyComp replyComp;
 	
-	private BoardDAOImple dao;
+	private BoardDAO dao;
 	private String[] tableCol = {"글 번호", "분류", "제목", "작성자", "작성일", "조회수"};
 	private Object[] post = new Object[tableCol.length];
 	private int currentPage = 1;
@@ -69,7 +66,7 @@ public class BoardDialog extends JDialog {
 		printedList = dao.selectPage(currentPage);
 		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		setVisible(true);
-		setBounds(100, 100, 952, 646);
+		setBounds(750, 300, 952, 646);
 		getContentPane().setLayout(null);
 		setAlwaysOnTop(true);
 		setListPanel();
@@ -155,13 +152,12 @@ public class BoardDialog extends JDialog {
 		cbxRead.setBounds(24, 23, 111, 54);
 		panelRead.add(cbxRead);
 		
-		
 		readBtnSet = new JPanel();
 		readBtnSet.setBounds(507, 521, 367, 45);
 		panelRead.add(readBtnSet);
 		readBtnSet.setLayout(null);
 		
-		btnBack = new JButton("목록으로");
+		JButton btnBack = new JButton("목록으로");
 		btnBack.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				setMode(LISTMODE);
@@ -244,7 +240,7 @@ public class BoardDialog extends JDialog {
 		});
 		scrollPane.setViewportView(table);
 		
-		panelSearch = new JPanel();
+		JPanel panelSearch = new JPanel();
 		panelSearch.setBounds(44, 514, 504, 61);
 		panelList.add(panelSearch);
 		panelSearch.setLayout(null);
@@ -261,7 +257,7 @@ public class BoardDialog extends JDialog {
 		panelSearch.add(txtTarget);
 		txtTarget.setColumns(10);
 		
-		btnSearch = new JButton("검색");
+		JButton btnSearch = new JButton("검색");
 		btnSearch.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) { // 검색 타입과 검색값 변경 후 페이지를 1로 설정
 				searchInit();
@@ -364,8 +360,7 @@ public class BoardDialog extends JDialog {
 		int selectedPostId = printedList.get(table.getSelectedRow()).getId();
 		dao.updateViewsUp(selectedPostId); // 조회수 +1
 		setMode(READMODE);
-		replyComp.setPostId(selectedPostId);
-		replyComp.printReply();
+		replyComp.printReply(selectedPostId);
 		selectedPost = dao.selectPostById(selectedPostId);
 		cbxRead.setSelectedItem(selectedPost.getTag());
 		txtReadTitle.setText(selectedPost.getTitle());
@@ -387,7 +382,7 @@ public class BoardDialog extends JDialog {
 				cbxRead.getSelectedItem().toString(), 0, null);
 		int res = dao.updatePost(vo);
 		if(res == 1) {
-			new AlertDialog("수정 성공");
+			AlertDialog.printMsg("수정 성공");
 		}
 	} // end updatePost
 	
@@ -395,21 +390,29 @@ public class BoardDialog extends JDialog {
 		System.out.println("BoardDialog : deletePost()");
 		int res = dao.deletePost(selectedPost.getId());
 		if(res == 1) {
-			new AlertDialog("삭제 성공");
+			AlertDialog.printMsg("삭제 성공");
 		}
 	} // end deletePost
 	
 	private void search() { // 현재 설정된 검색 타입과 페이지에 따라 검색 후 테이블에 출력
 		System.out.println("BoardDialog : search()");
+		ArrayList<PostVO> list;
+		
 		if(searchType == SEARCHTITLE) {
-			printedList = dao.selectPostByTitle(curTarget, currentPage);
+			list = dao.selectPostByTitle(curTarget, currentPage);
 		}else if(searchType == SEARCHWRITER) {
-			printedList = dao.selectPostByUid(curTarget, currentPage);
+			list = dao.selectPostByUid(curTarget, currentPage);
 		}else if(searchType == SEARCHTAG) {
-			printedList = dao.selectPostByTag(curTarget, currentPage);
+			list = dao.selectPostByTag(curTarget, currentPage);
 		}else {
-			printedList = dao.selectPage(currentPage);
+			list = dao.selectPage(currentPage);
 		}
+		if(list.size() == 0 && currentPage > 1) {
+			currentPage = Math.max(1, currentPage -1);
+		}else {
+			printedList = list;
+		}
+		
 		printTable();
 	} // end search
 	

@@ -22,29 +22,27 @@ import java.awt.event.ActionEvent;
 public class ReadingRoom extends JDialog {
 	
 	private static final long serialVersionUID = 1L;
-	private final JPanel contentPanel = new JPanel();
+	private JPanel PanelBackground = new JPanel();
 	private JPanel panelForMember;
-	private RoomDAOImple dao = null;
+	private RoomDAO dao = null;
 	private ArrayList<SeatVO> list = new ArrayList<>();
 	private ArrayList<JCheckBox> BList = new ArrayList<>();
 	private ButtonGroup group = new ButtonGroup();
 	private static Thread autoUpdate = null;
 	private Boolean autoUpdateFlag = true;
-	private String userId;
 	
 	public ReadingRoom(String userId, String userAuth) {
-		this.userId = userId;
 		dao = RoomDAOImple.getInstance();
 		autoUpdateFlag = true;
 		setAlwaysOnTop(true);
 		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		setVisible(true);
-		setBounds(100, 100, 913, 669);
+		setBounds(750, 300, 913, 669);
 		getContentPane().setLayout(null);
-		contentPanel.setBounds(0, 0, 895, 580);
-		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
-		getContentPane().add(contentPanel);
-		contentPanel.setLayout(null);
+		PanelBackground.setBounds(0, 0, 895, 580);
+		PanelBackground.setBorder(new EmptyBorder(5, 5, 5, 5));
+		getContentPane().add(PanelBackground);
+		PanelBackground.setLayout(null);
 		
 		panelForMember = new JPanel();
 		panelForMember.setBounds(512, 579, 373, 41);
@@ -58,9 +56,9 @@ public class ReadingRoom extends JDialog {
 				if(selected >= 0 && list.get(selected).getState().equals(OracleRoomQuery.STATE_EMPTY)) {
 					SeatVO alreadyOccupied = dao.checkSeatByUId(userId);
 					if(alreadyOccupied == null) {
-						occupySeat(selected);
+						occupySeat(selected, userId);
 					}else {
-						new AlertDialog("이미 " + alreadyOccupied.getSeatId() + "번 좌석을 사용중입니다.");
+						AlertDialog.printMsg("이미 " + alreadyOccupied.getSeatId() + "번 좌석을 사용중입니다.");
 					}
 				}
 			}
@@ -77,7 +75,7 @@ public class ReadingRoom extends JDialog {
 					if(selectedUId.equals(userId)) {
 						extendSeat(selected);
 					}else {
-						new AlertDialog("다른 사용자의 좌석입니다.");
+						AlertDialog.printMsg("다른 사용자의 좌석입니다.");
 					}
 				}
 			}
@@ -89,12 +87,14 @@ public class ReadingRoom extends JDialog {
 		btnReturn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				int selected = getSelectedBox();
-				if(selected >= 0 && list.get(selected).getState().equals(OracleRoomQuery.STATE_OCCUPIED)) {
-					String selectedUId = list.get(selected).getUserId();
+				SeatVO selectedSeat = list.get(selected);
+				
+				if(selected >= 0 && selectedSeat.getState().equals(OracleRoomQuery.STATE_OCCUPIED)) {
+					String selectedUId = selectedSeat.getUserId();
 					if(selectedUId.equals(userId)) {
-						emptySeat(list.get(selected).getSeatId());
+						emptySeat(selectedSeat.getSeatId());
 					}else {
-						new AlertDialog("다른 사용자의 좌석입니다.");
+						AlertDialog.printMsg("다른 사용자의 좌석입니다.");
 					}
 				}
 			}
@@ -123,7 +123,6 @@ public class ReadingRoom extends JDialog {
 		btnSave.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				saveChanged();
-				
 				dispose();
 			}
 		});
@@ -158,7 +157,8 @@ public class ReadingRoom extends JDialog {
 		});
 			autoUpdate.start();
 		}
-	}
+	} // end ReadingRoom
+	
 	private void initSeat() {
 		list = dao.selectAllSeat();
 		for(SeatVO vo : list) {
@@ -166,7 +166,7 @@ public class ReadingRoom extends JDialog {
 			box.setBounds(vo.getX(), vo.getY(), 100, 100);
 			
 			BList.add(box);
-			contentPanel.add(box);
+			PanelBackground.add(box);
 			group.add(box);
 		}
 	} // end initSeat
@@ -180,7 +180,7 @@ public class ReadingRoom extends JDialog {
 		return -1;
 	} // end getSelectedBox
 	
-	private void occupySeat(int selected) {
+	private void occupySeat(int selected, String userId) {
 		SeatVO pick = list.get(selected);
 		pick.setUserId(userId);
 		pick.setStart(LocalDateTime.now());
@@ -208,7 +208,7 @@ public class ReadingRoom extends JDialog {
 				reprintRemains();
 			}
 		}else {
-			new AlertDialog("아직 연장할 수 없습니다.");
+			AlertDialog.printMsg("아직 연장할 수 없습니다.");
 		}
 	} // end extendSeat
 
@@ -257,13 +257,13 @@ public class ReadingRoom extends JDialog {
 							break;
 						}
 					}
-					contentPanel.remove(cb);
+					PanelBackground.remove(cb);
 					revalidate();
 					repaint();
 				}
 			});
-		}
-		contentPanel.addMouseListener(new MouseAdapter() {
+		} // 기존의 모든 좌석을 체크 불가로 변경, 마우스 클릭시 제거되는 리스너 추가
+		PanelBackground.addMouseListener(new MouseAdapter() {
 		@Override
 		public void mouseClicked(MouseEvent e) {
 			int x = e.getX() /100 *100;
@@ -285,16 +285,16 @@ public class ReadingRoom extends JDialog {
 							break;
 						}
 					}
-					contentPanel.remove(box);
+					PanelBackground.remove(box);
 					revalidate();
 					repaint();
 				}
 			});
-			contentPanel.add(box);
+			PanelBackground.add(box);
 			revalidate();
 			repaint();
 		}
-		});
+		}); // 배경 패널에 마우스 클릭 리스너 추가 : 클릭 지점에 좌석(체크박스) 생성
 	} // end toEdit
 	
 	private void saveChanged() {
@@ -306,20 +306,20 @@ public class ReadingRoom extends JDialog {
 		ArrayList<String> prevSeatId = dao.selectAllSeatId();
 		if(list == null || prevSeatId == null)
 			return;
-		for(int i = 0; i < list.size(); i++)
-			System.out.print(list.get(i).getSeatId() + " ");
-		System.out.println();
+		
 		int lLen = list.size();
 		for(int i = 0; i < lLen; i++) {
-			int idx = prevSeatId.indexOf(list.get(0).getSeatId());
-			if(idx == -1) { // 변경리스트에는 있는데 테이블에 없는 경우
+			int idx = prevSeatId.indexOf(list.get(0).getSeatId()); 
+			// prevSeatId에 있는 값이면, 그 인덱스 반환, 없는 값이면 -1 반환
+			
+			if(idx == -1) { // 변경할 리스트에는 있는데 테이블에 없는 경우 (신규 좌석)
 				dao.insertNewSeat(list.get(0));
-			} else { // else 변경리스트와 테이블에 모두 있는 경우
+			} else { // else 변경할 리스트와 테이블에 모두 있는 경우 (이미 존재하던 좌석)
 				prevSeatId.remove(idx);
 			}
 			list.remove(0);
 		}
-		// 변경리스트에 없고 테이블에 있는 경우
+		// 변경할 리스트에 없고 테이블에 있는 경우 (삭제된 좌석)
 		for(String seatId : prevSeatId) {
 			dao.deleteSeat(seatId);
 		}

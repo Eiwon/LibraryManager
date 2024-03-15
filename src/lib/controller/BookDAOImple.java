@@ -101,7 +101,7 @@ public class BookDAOImple implements BookDAO, OracleBookQuery{
 	} // end updateBook
 	
 	public int deleteBook(int book_id) {
-		System.out.println("bookDaoImple : updateBook()");
+		System.out.println("bookDaoImple : deleteBook()");
 		int res = 0;
 		try {
 			DriverManager.registerDriver(new OracleDriver());
@@ -301,7 +301,7 @@ public class BookDAOImple implements BookDAO, OracleBookQuery{
 		}
 		
 		return userId;
-	}
+	} // end selectByBookState
 
 	@Override
 	public ArrayList<ArrayList<String>> selectAllInfoById(String userId) {
@@ -419,6 +419,36 @@ public class BookDAOImple implements BookDAO, OracleBookQuery{
 			
 			if(res == 1)
 				System.out.println("수정 성공");
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}finally {
+			try {
+				conn.close();
+				pstmt.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		return res;
+	}
+
+	@Override
+	public int getBookNum() {
+		System.out.println("bookDaoImple : getBookNum()");
+		int res = 0;
+		try {
+			DriverManager.registerDriver(new OracleDriver());
+			conn = DriverManager.getConnection(URL, USER, PASSWORD);
+			
+			pstmt = conn.prepareStatement(OracleBookQuery.SQL_SELECT_ALL_NUM);
+			
+			ResultSet rs = pstmt.executeQuery();
+			
+			if(rs.next() && rs.getString(1) != null) {
+				res = rs.getInt(1);
+			}
 			
 		} catch (SQLException e) {
 			e.printStackTrace();

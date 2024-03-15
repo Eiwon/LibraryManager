@@ -24,7 +24,7 @@ public class RoomDAOImple implements RoomDAO, OracleRoomQuery {
 			instance = new RoomDAOImple();
 		}
 		return instance;
-	}
+	} // end getInstance
 
 	@Override
 	public ArrayList<String> selectAllSeatId() {
@@ -52,7 +52,7 @@ public class RoomDAOImple implements RoomDAO, OracleRoomQuery {
 		}
 		
 		return list;
-	}
+	} // end selectAllSeatId
 
 	
 	@Override
@@ -83,9 +83,8 @@ public class RoomDAOImple implements RoomDAO, OracleRoomQuery {
 				e.printStackTrace();
 			}
 		}
-		
 		return res;
-	}
+	} // end insertNewSeat 
 
 	@Override
 	public int deleteSeat(String seatId) {
@@ -113,9 +112,8 @@ public class RoomDAOImple implements RoomDAO, OracleRoomQuery {
 				e.printStackTrace();
 			}
 		}
-		
 		return res;
-	}
+	} // end deleteSeat
 
 	@Override
 	public ArrayList<SeatVO> selectAllSeat() {
@@ -148,7 +146,7 @@ public class RoomDAOImple implements RoomDAO, OracleRoomQuery {
 		}
 		
 		return list;
-	}
+	} // end selectAllSeat
 
 	@Override
 	public int occupySeat(SeatVO seat) {
@@ -182,7 +180,7 @@ public class RoomDAOImple implements RoomDAO, OracleRoomQuery {
 		}
 		
 		return res;
-	}
+	} // end occupySeat
 
 	@Override
 	public int emptySeat(String seatId) {
@@ -216,7 +214,7 @@ public class RoomDAOImple implements RoomDAO, OracleRoomQuery {
 		}
 		
 		return res;
-	}
+	} // end emptySeat
 
 	@Override
 	public int extendSeat(String seatId) {
@@ -247,7 +245,7 @@ public class RoomDAOImple implements RoomDAO, OracleRoomQuery {
 		}
 		
 		return res;
-	}
+	} // end extendSeat
 
 	@Override
 	public SeatVO checkSeatByUId(String userId) {
@@ -279,6 +277,6 @@ public class RoomDAOImple implements RoomDAO, OracleRoomQuery {
 		}
 		
 		return vo;
-	}
+	} // end checkSeatByUId
 	
 }

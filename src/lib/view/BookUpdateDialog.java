@@ -23,15 +23,6 @@ import javax.swing.SwingConstants;
 public class BookUpdateDialog extends JDialog {
 	
 	private static final long serialVersionUID = 1L;
-	//private final JPanel contentPanel = new JPanel();
-	private JPanel panelName;
-	private JPanel panelWriter;
-	private JPanel panelCategory;
-	private JPanel panelPublisher;
-	private JPanel panelPubDate;
-	private JPanel panelImg;
-	private JLabel lblState;
-	private JLabel lblImg;
 	private JTextField txtName;
 	private JTextField txtWriter;
 	private JTextField txtCategory;
@@ -40,20 +31,11 @@ public class BookUpdateDialog extends JDialog {
 	private JTextField txtMonth;
 	private JTextField txtDay;
 	private JButton btnSubmit;
-	private JButton btnExit;
-	private JButton btnAddImg;
 	private BookDAO dao;
 	private BookVO updateTarget;
 	private ImageManager im;
 	private File selectedFile = null;
 	private JComboBox<String> cbxState;
-	private String[] stateOpt = { 
-			OracleBookQuery.BOOK_STATE_SET, 
-			OracleBookQuery.BOOK_STATE_OUT,
-			OracleBookQuery.BOOK_STATE_RSV,
-			OracleBookQuery.BOOK_STATE_RSVSET,
-			OracleBookQuery.BOOK_STATE_LOST
-			};
 	
 	public BookUpdateDialog() {
 		System.out.println("insert mode");
@@ -109,9 +91,8 @@ public class BookUpdateDialog extends JDialog {
 		im = ImageManager.getInstance();
 		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		setVisible(true);
-		setAlwaysOnTop(true);
 		
-		setBounds(100, 100, 635, 719);
+		setBounds(750, 300, 635, 719);
 		getContentPane().setLayout(null);
 		
 		JLabel lblMode = new JLabel("도서 등록");
@@ -123,19 +104,32 @@ public class BookUpdateDialog extends JDialog {
 		btnSubmit.setBounds(153, 519, 93, 66);
 		getContentPane().add(btnSubmit);
 			
-		btnExit = new JButton("돌아가기");
+		JButton btnExit = new JButton("돌아가기");
 		btnExit.setBounds(327, 519, 114, 66);
+		btnExit.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				dispose();
+			}
+		});	
 		getContentPane().add(btnExit);
 			
-		lblState = new JLabel("상태");
+		JLabel lblState = new JLabel("상태");
 		lblState.setBounds(38, 404, 161, 40);
 		getContentPane().add(lblState);
-			
+		
+		String[] stateOpt = { 
+				OracleBookQuery.BOOK_STATE_SET, 
+				OracleBookQuery.BOOK_STATE_OUT,
+				OracleBookQuery.BOOK_STATE_RSV,
+				OracleBookQuery.BOOK_STATE_RSVSET,
+				OracleBookQuery.BOOK_STATE_LOST
+				};
 		cbxState = new JComboBox<>(stateOpt);
 		cbxState.setBounds(135, 462, 114, 40);
 		getContentPane().add(cbxState);
 			
-		panelPubDate = new JPanel();
+		JPanel panelPubDate = new JPanel();
 		panelPubDate.setBounds(38, 320, 541, 54);
 		getContentPane().add(panelPubDate);
 		panelPubDate.setLayout(null);
@@ -176,20 +170,31 @@ public class BookUpdateDialog extends JDialog {
 		txtDay.setColumns(10);
 			
 			
-		panelImg = new JPanel();
+		JPanel panelImg = new JPanel();
 		panelImg.setBounds(341, 400, 238, 108);
 		getContentPane().add(panelImg);
 		panelImg.setLayout(null);
 			
-		lblImg = new JLabel();
+		JLabel lblImg = new JLabel();
 		lblImg.setBounds(12, 10, 95, 95);
 		panelImg.add(lblImg);
 			
-		btnAddImg = new JButton("사진 등록");
+		JButton btnAddImg = new JButton("사진 등록");
 		btnAddImg.setBounds(134, 29, 97, 48);
+		btnAddImg.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				JFileChooser chooser = new JFileChooser();
+				int result = chooser.showOpenDialog(null);
+				
+				if(result == JFileChooser.APPROVE_OPTION) {
+					selectedFile = chooser.getSelectedFile();
+					lblImg.setIcon(im.convToIcon(selectedFile));
+				}
+			}
+		});
 		panelImg.add(btnAddImg);
 			
-		panelName = new JPanel();
+		JPanel panelName = new JPanel();
 		panelName.setBounds(38, 66, 550, 60);
 		getContentPane().add(panelName);
 		panelName.setLayout(null);
@@ -204,7 +209,7 @@ public class BookUpdateDialog extends JDialog {
 		panelName.add(txtName);
 		txtName.setColumns(10);
 			
-		panelWriter = new JPanel();
+		JPanel panelWriter = new JPanel();
 		panelWriter.setBounds(38, 130, 556, 66);
 		getContentPane().add(panelWriter);
 		panelWriter.setLayout(null);
@@ -219,7 +224,7 @@ public class BookUpdateDialog extends JDialog {
 		panelWriter.add(txtWriter);
 		txtWriter.setColumns(10);
 			
-		panelCategory = new JPanel();
+		JPanel panelCategory = new JPanel();
 		panelCategory.setBounds(38, 195, 556, 62);
 		getContentPane().add(panelCategory);
 		panelCategory.setLayout(null);
@@ -234,7 +239,7 @@ public class BookUpdateDialog extends JDialog {
 		panelCategory.add(txtCategory);
 		txtCategory.setColumns(10);
 			
-		panelPublisher = new JPanel();
+		JPanel panelPublisher = new JPanel();
 		panelPublisher.setBounds(38, 256, 550, 66);
 		getContentPane().add(panelPublisher);
 		panelPublisher.setLayout(null);
@@ -248,24 +253,7 @@ public class BookUpdateDialog extends JDialog {
 		txtPublisher.setBounds(120, 10, 400, 40);
 		panelPublisher.add(txtPublisher);
 		txtPublisher.setColumns(10);
-		btnAddImg.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				JFileChooser chooser = new JFileChooser();
-				int result = chooser.showOpenDialog(null);
-				if(result == JFileChooser.APPROVE_OPTION) {
-					selectedFile = chooser.getSelectedFile();
-					lblImg.setIcon(im.convToIcon(selectedFile));
-				}
-			}
-		});
 			
-		btnExit.addActionListener(new ActionListener() {
-				
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				dispose();
-			}
-		});	
 	} // end init
 	
 	private BookVO validCheck() {
@@ -273,13 +261,12 @@ public class BookUpdateDialog extends JDialog {
 		String writer = txtWriter.getText();
 		String category = txtCategory.getText();
 		String publisher = txtPublisher.getText();
-		
 		String state = cbxState.getSelectedItem().toString();
 		String img = null;
 		
 		if(name.length() * writer.length() * category.length() * publisher.length() * txtYear.getText().length() 
 				* txtMonth.getText().length() * txtDay.getText().length() * state.length() == 0) {
-			new AlertDialog("모든 필드 입력 필요");
+			AlertDialog.printMsg("모든 필드 입력 필요");
 			return null;
 		}
 		if(selectedFile != null) {
@@ -292,11 +279,11 @@ public class BookUpdateDialog extends JDialog {
 			month = Integer.parseInt(txtMonth.getText());
 			day = Integer.parseInt(txtDay.getText());
 		}catch(Exception e) {
-			new AlertDialog("잘못된 입력");
+			AlertDialog.printMsg("잘못된 입력");
 			return null;
 		}
 		if(year < 0 || year > LocalDateTime.now().getYear() || month < 1 || month > 12 || day < 1 || day > 31) {
-			new AlertDialog("잘못된 날짜 형식");
+			AlertDialog.printMsg("잘못된 날짜 형식");
 			return null;
 		}
 		

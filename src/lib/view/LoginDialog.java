@@ -28,7 +28,12 @@ public class LoginDialog extends JDialog {
 	private JPanel panelLogin;
 	private JPanel panelSignup;
 
-	private String idRex = "^[a-zA-Z][a-zA-Z0-9]{1,20}$";
+	private String idRex = "^[a-zA-Z][a-zA-Z0-9]{5,19}$";
+	private String pwRex = "^[a-zA-Z0-9]{8,20}$";
+	private String nameRex = "^[a-zA-Zㄱ-힣]{2,20}$";
+	private String phoneRex = "^010[0-9]{7,8}$";
+	private String emailRex = "^[a-zA-Z0-9]{4,8}@[a-z]{4,8}.[a-z.]{4,6}$";
+	
 	private UserDAO userDao = null;
 	private boolean validId = false;
 	
@@ -221,7 +226,7 @@ public class LoginDialog extends JDialog {
 	private boolean isValidId(String userId) {
 		String inputId = userId;
 		if(!Pattern.matches(idRex, inputId)) {
-			AlertDialog.printMsg("잘못된 ID 형식");
+			AlertDialog.printMsg("ID는 알파벳으로 시작, 5~20자의 알파벳 또는 숫자이여야 합니다.");
 			return false;
 		}
 		UserVO vo = userDao.selectByID(inputId);
@@ -235,11 +240,23 @@ public class LoginDialog extends JDialog {
 	} // end validCheck
 	
 	private boolean signup(String userId, String pw, String name, String phone, String email) {
-		if(pw.length() * name.length() * phone.length() * email.length() == 0) {
-			// 입력되지 않은 필드가 있는지 확인
-			AlertDialog.printMsg("모든 필드 입력 필요");
+		if(!Pattern.matches(pwRex, pw)) {
+			AlertDialog.printMsg("비밀번호는 8~20자의 알파벳 또는 숫자이여야 합니다.");
 			return false;
 		}
+		if(!Pattern.matches(nameRex, name)) {
+			AlertDialog.printMsg("이름은 2~20자의 한글 또는 알파벳이여야 합니다.");
+			return false;
+		}
+		if(!Pattern.matches(phoneRex, phone)) {
+			AlertDialog.printMsg("잘못된 전화번호 형식입니다.");
+			return false;
+		}
+		if(!Pattern.matches(emailRex, email)) {
+			AlertDialog.printMsg("잘못된 이메일 형식입니다.");
+			return false;
+		}
+		
 		if(validId == false) {
 			AlertDialog.printMsg("아이디 중복 체크 필요");
 			return false;

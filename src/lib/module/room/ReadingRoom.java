@@ -159,6 +159,7 @@ public class ReadingRoom extends JDialog {
 		}
 	} // end ReadingRoom
 	
+	// DB로부터 좌석 위치값을 읽어와 좌석 객체 생성
 	private void initSeat() {
 		list = dao.selectAllSeat();
 		for(SeatVO vo : list) {
@@ -171,6 +172,7 @@ public class ReadingRoom extends JDialog {
 		}
 	} // end initSeat
 	
+	// 좌석 리스트에서 선택된 좌석이 있는지 확인 후 그 인덱스 반환, 없다면 -1 반환
 	private int getSelectedBox() {
 		for(int i = 0; i < BList.size(); i++) {
 			if(BList.get(i).isSelected()) {
@@ -180,6 +182,7 @@ public class ReadingRoom extends JDialog {
 		return -1;
 	} // end getSelectedBox
 	
+	// 유저가 좌석을 대여하면 실행, 좌석을 "OCCUPIED" 상태로 변경
 	private void occupySeat(int selected, String userId) {
 		SeatVO pick = list.get(selected);
 		pick.setUserId(userId);
@@ -188,17 +191,18 @@ public class ReadingRoom extends JDialog {
 		pick.setState(OracleRoomQuery.STATE_OCCUPIED);
 		
 		if(dao.occupySeat(pick) == 1) {
-			BList.get(selected).setBackground(Color.red);
 			reprintRemains();
 		}
 	} // end occupySeat
 	
+	// 유저가 좌석을 반납하면 실행, 좌석을 "EMPTY" 상태로 변경
 	private void emptySeat(String seatId) {
 		if(dao.emptySeat(seatId) == 1) {
 			reprintRemains();
 		}
 	} // end emptySeat
 	
+	// 유저가 좌석 대여 시간을 연장하면 실행
 	private void extendSeat(int selected) {
 		// 선택된 좌석의 남은 시간이 2시간 이하이면, 반납시간을 현재시간+4시간으로 변경
 		SeatVO pick = list.get(selected);
@@ -212,7 +216,7 @@ public class ReadingRoom extends JDialog {
 		}
 	} // end extendSeat
 
-	
+	// 모든 좌석의 색, 텍스트 최신화
 	private void reprintRemains() {
 		System.out.println("reprintRemains");
 		list = dao.selectAllSeat();
@@ -235,12 +239,12 @@ public class ReadingRoom extends JDialog {
 				BList.get(i).setBackground(Color.green);
 				BList.get(i).setText("No." + list.get(i).getSeatId());
 			}
-			
 		}
 		revalidate();
 		repaint();
 	} // end reprintRemains
 	
+	// 편집 모드로 변경, 
 	private void toEdit() {
 		autoUpdateFlag = false;
 		panelForMember.setVisible(false);
@@ -249,7 +253,6 @@ public class ReadingRoom extends JDialog {
 			cb.addMouseListener(new MouseAdapter() {
 				@Override
 				public void mouseClicked(MouseEvent e) {
-					
 					for(int i = 0; i < list.size(); i++) {
 						if(list.get(i).getX() /100 == cb.getX()/100 && list.get(i).getY() /100 == cb.getY()/100) {
 							list.remove(i);
@@ -281,7 +284,6 @@ public class ReadingRoom extends JDialog {
 					for(int i = 0; i < list.size(); i++) {
 						if(list.get(i).getX() /100 == box.getX() /100 && list.get(i).getY() /100 == box.getY() /100) {
 							list.remove(i);
-							BList.remove(i);
 							break;
 						}
 					}
@@ -323,6 +325,6 @@ public class ReadingRoom extends JDialog {
 		for(String seatId : prevSeatId) {
 			dao.deleteSeat(seatId);
 		}
-		
 	} // end saveChanged
+	
 }

@@ -32,7 +32,7 @@ public class LoginDialog extends JDialog {
 	private String pwRex = "^[a-zA-Z0-9]{8,20}$";
 	private String nameRex = "^[a-zA-Zㄱ-힣]{2,20}$";
 	private String phoneRex = "^010[0-9]{7,8}$";
-	private String emailRex = "^[a-zA-Z0-9]{4,8}@[a-z]{4,8}.[a-z.]{4,6}$";
+	private String emailRex = "^[a-zA-Z0-9]{4,15}@[a-z.]{4,14}$";
 	
 	private UserDAO userDao = null;
 	private boolean validId = false;

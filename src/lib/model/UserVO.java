@@ -1,4 +1,6 @@
-package Model;
+package lib.model;
+
+import lib.Interface.OracleUserQuery;
 
 public class UserVO {
 	private String userId;
@@ -16,7 +18,7 @@ public class UserVO {
 		this.name = name;
 		this.phone = phone;
 		this.email = email;
-		this.auth = "ADMIN";
+		this.auth = OracleUserQuery.AUTH_GUEST;
 	}
 	
 	public String getUserId() {

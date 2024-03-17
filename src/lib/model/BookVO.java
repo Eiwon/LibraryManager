@@ -1,4 +1,6 @@
-package Model;
+package lib.model;
+
+import java.time.LocalDateTime;
 
 public class BookVO {
 	private int bookId;
@@ -6,12 +8,12 @@ public class BookVO {
 	private String writer;
 	private String category;
 	private String publisher;
-	private String pubDate;
+	private LocalDateTime pubDate;
 	private String state;
 	private String img = null;
 	
 	public BookVO() {}
-	public BookVO(int bookId, String name, String writer, String category, String publisher, String pubDate,
+	public BookVO(int bookId, String name, String writer, String category, String publisher, LocalDateTime pubDate,
 			String state, String img) {
 		super();
 		this.bookId = bookId;
@@ -24,7 +26,7 @@ public class BookVO {
 		this.img = img;
 	}
 	
-	public BookVO(int bookId, String name, String writer, String category, String publisher, String pubDate) {
+	public BookVO(int bookId, String name, String writer, String category, String publisher, LocalDateTime pubDate) {
 		super();
 		this.bookId = bookId;
 		this.name = name;
@@ -77,11 +79,11 @@ public class BookVO {
 		this.publisher = publisher;
 	}
 
-	public String getPubDate() {
+	public LocalDateTime getPubDate() {
 		return pubDate;
 	}
 
-	public void setPubDate(String pubDate) {
+	public void setPubDate(LocalDateTime pubDate) {
 		this.pubDate = pubDate;
 	}
 

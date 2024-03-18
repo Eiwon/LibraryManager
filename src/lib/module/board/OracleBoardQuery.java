@@ -2,7 +2,7 @@ package lib.module.board;
 
 public interface OracleBoardQuery {
 	
-	public static final String URL = "jdbc:oracle:thin:@localhost:1521:xe"; // 접속할 오라클 경로
+	public static final String URL = "jdbc:oracle:thin:@192.168.0.146:1521:xe"; // 접속할 오라클 경로
 	public static final String USER = "scott";
 	public static final String PASSWORD = "tiger";
 	

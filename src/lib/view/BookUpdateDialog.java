@@ -126,7 +126,7 @@ public class BookUpdateDialog extends JDialog {
 				OracleBookQuery.BOOK_STATE_LOST
 				};
 		cbxState = new JComboBox<>(stateOpt);
-		cbxState.setBounds(135, 462, 114, 40);
+		cbxState.setBounds(135, 402, 114, 40);
 		getContentPane().add(cbxState);
 			
 		JPanel panelPubDate = new JPanel();

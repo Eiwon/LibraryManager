@@ -47,7 +47,7 @@ public class Library extends JFrame{
 		getContentPane().add(bookManager);
 		
 		btnLogin = new JButton();
-		btnLogin.setBounds(0, 0, 100, 50);
+		btnLogin.setBounds(1150, 750, 100, 50);
 		btnLogin.setText("로그인");
 		btnLogin.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
